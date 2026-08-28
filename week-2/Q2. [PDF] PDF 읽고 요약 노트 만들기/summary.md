@@ -1,6 +1,6 @@
 # 하버스쿨 · AI 공장장 부트캠프 — 요약 노트 (최종본)
 
-(원본: `harbor-afm-curriculum.pdf`, 총 7페이지)
+(원본 PDF는 저작권 문제로 저장소에 포함하지 않았습니다. 공개 소개 페이지: https://www.harbor.school/courses/ai-factory-manager)
 
 ---
 

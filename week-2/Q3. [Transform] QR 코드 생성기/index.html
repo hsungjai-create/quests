@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>명함 QR 코드 생성기</title>
+<script src="https://cdn.tailwindcss.com/3.4.16"></script>
+<!-- ⚠️ 모든 CDN은 버전을 명시적으로 고정한다. -->
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" crossorigin></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" crossorigin></script>
+<script src="https://unpkg.com/@babel/standalone@7.25.9/babel.min.js"></script>
+<!-- QR 코드 생성 라이브러리 (완전 클라이언트 사이드, 서버 호출 없음. typeNumber=0 자동 산정으로 긴 vCard도 지원) -->
+<script src="https://cdn.jsdelivr.net/npm/qrcode-generator@1.4.4/qrcode.js"></script>
+<!-- 한글 등 다국어(비-ASCII) 텍스트를 올바른 UTF-8로 인코딩하기 위한 필수 패치 (qrcode.js 뒤에 반드시 로드) -->
+<script src="https://cdn.jsdelivr.net/npm/qrcode-generator@1.4.4/qrcode_UTF8.js"></script>
+<style>
+  body { background: #f3f4f6; }
+</style>
+</head>
+<body>
+<div id="root"></div>
+<script type="text/babel">
+const { useState, useEffect, useCallback } = React;
+
+// ========================================
+// 🎨 Design System Components
+// ========================================
+
+function Button({ variant = "primary", size = "md", disabled, onClick, className = "", children, type = "button" }) {
+  const base = "inline-flex items-center justify-center gap-2 rounded-lg font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed";
+  const variants = {
+    primary: "bg-orange-500 text-white hover:bg-orange-600 focus:ring-orange-400",
+    secondary: "bg-white text-gray-700 border border-gray-300 hover:bg-gray-50 focus:ring-gray-300",
+    danger: "bg-red-50 text-red-600 hover:bg-red-100 focus:ring-red-300",
+    ghost: "bg-transparent text-gray-500 hover:bg-gray-100 focus:ring-gray-200",
+  };
+  const sizes = {
+    sm: "px-3 py-1.5 text-sm",
+    md: "px-4 py-2.5 text-sm",
+    lg: "px-6 py-3 text-base",
+  };
+  return (
+    <button
+      type={type}
+      disabled={disabled}
+      onClick={onClick}
+      className={`${base} ${variants[variant]} ${sizes[size]} ${className}`}
+    >
+      {children}
+    </button>
+  );
+}
+
+function Input({ label, value, onChange, placeholder, type = "text", error, disabled, className = "" }) {
+  return (
+    <label className={`block ${className}`}>
+      {label && <span className="mb-1 block text-sm font-medium text-gray-700">{label}</span>}
+      <input
+        type={type}
+        value={value}
+        onChange={onChange}
+        placeholder={placeholder}
+        disabled={disabled}
+        className={`w-full rounded-lg border px-3 py-2 text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-orange-300 ${error ? "border-red-400" : "border-gray-300"}`}
+      />
+      {error && <span className="mt-1 block text-xs text-red-500">{error}</span>}
+    </label>
+  );
+}
+
+function Textarea({ label, value, onChange, placeholder, rows = 2, className = "" }) {
+  return (
+    <label className={`block ${className}`}>
+      {label && <span className="mb-1 block text-sm font-medium text-gray-700">{label}</span>}
+      <textarea
+        value={value}
+        onChange={onChange}
+        placeholder={placeholder}
+        rows={rows}
+        className="w-full resize-none rounded-lg border border-gray-300 px-3 py-2 text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-orange-300"
+      />
+    </label>
+  );
+}
+
+function Card({ className = "", children }) {
+  return (
+    <div className={`rounded-2xl bg-white p-5 shadow-sm ring-1 ring-gray-100 ${className}`}>
+      {children}
+    </div>
+  );
+}
+
+// ========================================
+// 📄 vCard 유틸리티
+// ========================================
+
+function escapeVCardValue(str) {
+  return String(str ?? "")
+    .replace(/\\/g, "\\\\")
+    .replace(/;/g, "\\;")
+    .replace(/,/g, "\\,")
+    .replace(/\n/g, "\\n");
+}
+
+function buildVCard({ name, org, title, mobile, emails, address, note }) {
+  const lines = ["BEGIN:VCARD", "VERSION:3.0"];
+  lines.push(`N:;${escapeVCardValue(name)};;;`);
+  lines.push(`FN:${escapeVCardValue(name)}`);
+  if (org) lines.push(`ORG:${escapeVCardValue(org)}`);
+  if (title) lines.push(`TITLE:${escapeVCardValue(title)}`);
+  if (mobile) lines.push(`TEL;TYPE=CELL,VOICE:${escapeVCardValue(mobile)}`);
+  emails.filter((e) => e && e.trim()).forEach((email) => {
+    lines.push(`EMAIL;TYPE=INTERNET:${escapeVCardValue(email.trim())}`);
+  });
+  if (address) lines.push(`ADR;TYPE=WORK:;;${escapeVCardValue(address)};;;;`);
+  if (note) lines.push(`NOTE:${escapeVCardValue(note)}`);
+  lines.push("END:VCARD");
+  return lines.join("\r\n");
+}
+
+// ========================================
+// 📄 Page Component
+// ========================================
+
+function QRCardGenerator() {
+  const [name, setName] = useState("황성재");
+  const [org, setOrg] = useState("PEAF");
+  const [title, setTitle] = useState("대표/공동창업자");
+  const [mobile, setMobile] = useState("010-2582-2111");
+  const [emails, setEmails] = useState(["sj.hwang@peaf789.xyz", "h.sungjai@gmail.com"]);
+  const [address, setAddress] = useState("경기도 화성시 동탄구 동탄지성로 11, 714-A182호");
+  const [note, setNote] = useState("Passive Entrepreneur, Active Faith");
+  const [copied, setCopied] = useState(false);
+  const [qrReady, setQrReady] = useState(false);
+
+  const [qrImageUrl, setQrImageUrl] = useState(null);
+  const [qrError, setQrError] = useState("");
+
+  const vcardText = buildVCard({ name, org, title, mobile, emails, address, note });
+
+  useEffect(() => {
+    if (!window.qrcode) return;
+    try {
+      // typeNumber 0 = 데이터 길이에 맞춰 QR 버전을 자동으로 산정(긴 vCard도 안전하게 처리)
+      const qr = window.qrcode(0, "M");
+      qr.addData(vcardText);
+      qr.make();
+      setQrImageUrl(qr.createDataURL(6, 8));
+      setQrError("");
+      setQrReady(true);
+    } catch (err) {
+      console.error(err);
+      setQrImageUrl(null);
+      setQrReady(false);
+      setQrError("QR 코드를 만들지 못했습니다. 입력값을 조금 줄여보세요.");
+    }
+  }, [vcardText]);
+
+  const handleEmailChange = (idx, value) => {
+    setEmails((prev) => prev.map((e, i) => (i === idx ? value : e)));
+  };
+
+  const handleAddEmail = () => setEmails((prev) => [...prev, ""]);
+
+  const handleRemoveEmail = (idx) => {
+    setEmails((prev) => (prev.length > 1 ? prev.filter((_, i) => i !== idx) : prev));
+  };
+
+  const handleDownload = () => {
+    if (!qrImageUrl || !qrReady) return;
+    // 라이브러리가 만드는 원본은 GIF이므로, 캔버스를 거쳐 PNG로 변환해 다운로드한다.
+    const img = new Image();
+    img.onload = () => {
+      const canvas = document.createElement("canvas");
+      canvas.width = img.width;
+      canvas.height = img.height;
+      const ctx = canvas.getContext("2d");
+      ctx.drawImage(img, 0, 0);
+      const pngUrl = canvas.toDataURL("image/png");
+      const a = document.createElement("a");
+      a.href = pngUrl;
+      a.download = `${name || "contact"}-QR.png`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+    };
+    img.src = qrImageUrl;
+  };
+
+  const handleCopy = useCallback(async () => {
+    try {
+      await navigator.clipboard.writeText(vcardText);
+      setCopied(true);
+    } catch (e) {
+      const ta = document.createElement("textarea");
+      ta.value = vcardText;
+      document.body.appendChild(ta);
+      ta.select();
+      try {
+        document.execCommand("copy");
+        setCopied(true);
+      } catch (e2) {
+        /* no-op */
+      }
+      document.body.removeChild(ta);
+    }
+  }, [vcardText]);
+
+  useEffect(() => {
+    if (!copied) return;
+    const t = setTimeout(() => setCopied(false), 1500);
+    return () => clearTimeout(t);
+  }, [copied]);
+
+  return (
+    <div className="min-h-screen px-4 py-10 sm:px-6 lg:px-8">
+      <div className="mx-auto max-w-4xl">
+        <header className="mb-8 text-center">
+          <h1 className="text-2xl font-bold text-gray-900 sm:text-3xl">명함 QR 코드 생성기</h1>
+          <p className="mt-2 text-sm text-gray-500">
+            아래 정보를 담아 QR 코드를 만듭니다. 스캔하면 스마트폰에서 바로 "연락처 추가" 화면이 열립니다.
+          </p>
+        </header>
+
+        <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
+          {/* 입력 폼 */}
+          <Card>
+            <h2 className="mb-4 text-lg font-semibold text-gray-800">연락처 정보</h2>
+            <div className="space-y-4">
+              <Input label="이름" value={name} onChange={(e) => setName(e.target.value)} placeholder="홍길동" />
+              <div className="grid grid-cols-2 gap-3">
+                <Input label="회사명" value={org} onChange={(e) => setOrg(e.target.value)} placeholder="회사명" />
+                <Input label="직함" value={title} onChange={(e) => setTitle(e.target.value)} placeholder="직함" />
+              </div>
+              <Input label="휴대폰" value={mobile} onChange={(e) => setMobile(e.target.value)} placeholder="010-0000-0000" />
+
+              <div>
+                <span className="mb-1 block text-sm font-medium text-gray-700">이메일</span>
+                <div className="space-y-2">
+                  {emails.map((email, idx) => (
+                    <div key={idx} className="flex items-center gap-2">
+                      <input
+                        type="email"
+                        value={email}
+                        onChange={(e) => handleEmailChange(idx, e.target.value)}
+                        placeholder="email@example.com"
+                        className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-orange-300"
+                      />
+                      <button
+                        type="button"
+                        aria-label="이메일 삭제"
+                        onClick={() => handleRemoveEmail(idx)}
+                        disabled={emails.length <= 1}
+                        className="shrink-0 rounded-lg px-2 py-2 text-gray-400 hover:bg-gray-100 hover:text-red-500 disabled:cursor-not-allowed disabled:opacity-40"
+                      >
+                        ✕
+                      </button>
+                    </div>
+                  ))}
+                </div>
+                <Button variant="ghost" size="sm" className="mt-2" onClick={handleAddEmail}>
+                  + 이메일 추가
+                </Button>
+              </div>
+
+              <Textarea label="주소" value={address} onChange={(e) => setAddress(e.target.value)} placeholder="주소" rows={2} />
+              <Textarea label="메모 (선택)" value={note} onChange={(e) => setNote(e.target.value)} placeholder="한 줄 소개" rows={2} />
+            </div>
+          </Card>
+
+          {/* QR 미리보기 */}
+          <Card className="flex flex-col items-center">
+            <h2 className="mb-4 self-start text-lg font-semibold text-gray-800">QR 코드</h2>
+            <div
+              className="flex items-center justify-center rounded-xl border border-gray-100 bg-white p-4"
+              style={{ width: 292, height: 292 }}
+            >
+              {qrImageUrl ? (
+                <img src={qrImageUrl} alt="생성된 QR 코드" className="h-auto max-h-full w-auto max-w-full" />
+              ) : (
+                <span className="text-xs text-gray-400">{qrError || "QR 코드를 생성하는 중..."}</span>
+              )}
+            </div>
+
+            <Button variant="primary" size="md" className="mt-4 w-full" onClick={handleDownload} disabled={!qrReady}>
+              PNG로 다운로드
+            </Button>
+
+            <div className="mt-6 w-full">
+              <div className="mb-2 flex items-center justify-between">
+                <span className="text-sm font-medium text-gray-700">vCard 원문</span>
+                <Button variant="secondary" size="sm" onClick={handleCopy}>
+                  {copied ? "복사됨 ✓" : "복사"}
+                </Button>
+              </div>
+              <pre className="max-h-48 overflow-auto whitespace-pre-wrap rounded-lg bg-gray-50 p-3 text-xs text-gray-600 ring-1 ring-gray-100">
+{vcardText}
+              </pre>
+            </div>
+          </Card>
+        </div>
+
+        <footer className="mt-8 text-center text-xs text-gray-400">
+          모든 처리는 이 브라우저 안에서만 이루어지며, 입력한 정보는 외부로 전송되지 않습니다.
+        </footer>
+      </div>
+    </div>
+  );
+}
+
+// ========================================
+// 🚀 App Component
+// ========================================
+
+function App() {
+  return <QRCardGenerator />;
+}
+
+// ========================================
+// Rendering
+// ========================================
+
+ReactDOM.createRoot(document.getElementById("root")).render(<App />);
+</script>
+</body>
+</html>

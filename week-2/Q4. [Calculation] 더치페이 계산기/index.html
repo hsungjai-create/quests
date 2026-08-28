@@ -1,0 +1,598 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>더치페이 계산기</title>
+<script src="https://cdn.tailwindcss.com/3.4.16"></script>
+<!-- ⚠️ 모든 CDN은 버전을 명시적으로 고정한다. -->
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" crossorigin></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" crossorigin></script>
+<script src="https://unpkg.com/@babel/standalone@7.25.9/babel.min.js"></script>
+<style>
+  body { background: #f3f4f6; }
+</style>
+</head>
+<body>
+<div id="root"></div>
+<script type="text/babel">
+const { useState, useCallback } = React;
+
+// ========================================
+// 🧩 ID 유틸리티
+// ========================================
+
+let idCounter = 0;
+function makeId() {
+  idCounter += 1;
+  return `id-${idCounter}`;
+}
+
+// ========================================
+// 🎨 Design System Components
+// ========================================
+
+function Button({ variant = "primary", size = "md", disabled, onClick, className = "", children, type = "button" }) {
+  const base = "inline-flex items-center justify-center gap-2 rounded-lg font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed";
+  const variants = {
+    primary: "bg-emerald-600 text-white hover:bg-emerald-700 focus:ring-emerald-400",
+    secondary: "bg-white text-gray-700 border border-gray-300 hover:bg-gray-50 focus:ring-gray-300",
+    danger: "bg-red-50 text-red-600 hover:bg-red-100 focus:ring-red-300",
+    ghost: "bg-transparent text-gray-500 hover:bg-gray-100 focus:ring-gray-200",
+  };
+  const sizes = {
+    sm: "px-3 py-1.5 text-sm",
+    md: "px-4 py-2.5 text-sm",
+    lg: "px-6 py-3 text-base",
+  };
+  return (
+    <button
+      type={type}
+      disabled={disabled}
+      onClick={onClick}
+      className={`${base} ${variants[variant]} ${sizes[size]} ${className}`}
+    >
+      {children}
+    </button>
+  );
+}
+
+function Input({ label, value, onChange, placeholder, className = "" }) {
+  return (
+    <label className={`block ${className}`}>
+      {label && <span className="mb-1 block text-sm font-medium text-gray-700">{label}</span>}
+      <input
+        type="text"
+        value={value}
+        onChange={onChange}
+        placeholder={placeholder}
+        className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-emerald-300"
+      />
+    </label>
+  );
+}
+
+function NumberInput({ label, value, onChange, placeholder, className = "" }) {
+  const display = value === "" || value === null || value === undefined ? "" : Number(value).toLocaleString("ko-KR");
+  const handleChange = (e) => {
+    const digits = e.target.value.replace(/[^0-9]/g, "");
+    onChange(digits === "" ? "" : Number(digits));
+  };
+  return (
+    <label className={`block ${className}`}>
+      {label && <span className="mb-1 block text-sm font-medium text-gray-700">{label}</span>}
+      <div className="relative">
+        <input
+          type="text"
+          inputMode="numeric"
+          value={display}
+          onChange={handleChange}
+          placeholder={placeholder}
+          className="w-full rounded-lg border border-gray-300 px-3 py-2 pr-9 text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-emerald-300"
+        />
+        <span className="pointer-events-none absolute inset-y-0 right-3 flex items-center text-xs text-gray-400">원</span>
+      </div>
+    </label>
+  );
+}
+
+function Card({ className = "", children }) {
+  return (
+    <div className={`rounded-2xl bg-white p-5 shadow-sm ring-1 ring-gray-100 ${className}`}>
+      {children}
+    </div>
+  );
+}
+
+function formatWon(n) {
+  return `${Number(n || 0).toLocaleString("ko-KR")}원`;
+}
+
+// ========================================
+// 🧮 계산 유틸리티
+// ========================================
+
+// total 을 n 명에게 정수 원 단위로 나눈다. 나머지(소수점 처리)는 여러 명에게 나눠주지 않고,
+// 무작위로 뽑은 한 명에게 통째로 배정한다.
+function splitEvenlyRandomRemainder(total, n) {
+  if (n <= 0) return { shares: [], remainderIndex: -1 };
+  const base = Math.floor(total / n);
+  const remainder = total - base * n;
+  const shares = Array.from({ length: n }, () => base);
+  const remainderIndex = remainder > 0 ? Math.floor(Math.random() * n) : -1;
+  if (remainderIndex >= 0) shares[remainderIndex] += remainder;
+  return { shares, remainderIndex };
+}
+
+// 위 함수의 shares 배열만 필요한 경우를 위한 축약형.
+function splitEvenly(total, n) {
+  return splitEvenlyRandomRemainder(total, n).shares;
+}
+
+function displayName(p, idx) {
+  return p.name.trim() || `참가자 ${idx + 1}`;
+}
+
+// ========================================
+// 🧩 참가자 목록 편집 컴포넌트
+// ========================================
+
+function ParticipantEditor({ participants, onChange }) {
+  const updateName = (id, name) => onChange(participants.map((p) => (p.id === id ? { ...p, name } : p)));
+  const addParticipant = () => onChange([...participants, { id: makeId(), name: "" }]);
+  const removeParticipant = (id) => onChange(participants.length > 1 ? participants.filter((p) => p.id !== id) : participants);
+
+  return (
+    <div>
+      <span className="mb-2 block text-sm font-medium text-gray-700">참가자</span>
+      <div className="space-y-2">
+        {participants.map((p, idx) => (
+          <div key={p.id} className="flex items-center gap-2">
+            <input
+              type="text"
+              value={p.name}
+              onChange={(e) => updateName(p.id, e.target.value)}
+              placeholder={`참가자 ${idx + 1}`}
+              className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-emerald-300"
+            />
+            <button
+              type="button"
+              aria-label="참가자 삭제"
+              onClick={() => removeParticipant(p.id)}
+              disabled={participants.length <= 1}
+              className="shrink-0 rounded-lg px-2 py-2 text-gray-400 hover:bg-gray-100 hover:text-red-500 disabled:cursor-not-allowed disabled:opacity-40"
+            >
+              ✕
+            </button>
+          </div>
+        ))}
+      </div>
+      <Button variant="ghost" size="sm" className="mt-2" onClick={addParticipant}>
+        + 참가자 추가
+      </Button>
+    </div>
+  );
+}
+
+// ========================================
+// 📄 1단계: 방식 선택 화면
+// ========================================
+
+function ModeSelectScreen({ onSelect }) {
+  const options = [
+    {
+      mode: "A",
+      title: "균등 분배",
+      desc: "총 금액을 인원수대로 똑같이 나눕니다.",
+      example: "예: 60,000원 ÷ 3명 = 20,000원씩",
+      emoji: "➗",
+    },
+    {
+      mode: "B",
+      title: "항목별 분배",
+      desc: "메뉴마다 누가 먹었는지 체크해서, 각자 먹은 만큼만 계산합니다.",
+      example: "예: 치킨은 A·B만, 피자는 다같이",
+      emoji: "🧾",
+    },
+  ];
+
+  return (
+    <div className="mx-auto max-w-3xl">
+      <header className="mb-8 text-center">
+        <h1 className="text-2xl font-bold text-gray-900 sm:text-3xl">더치페이 계산기</h1>
+        <p className="mt-2 text-sm text-gray-500">정산 방식을 선택해주세요.</p>
+      </header>
+
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+        {options.map((opt) => (
+          <button
+            key={opt.mode}
+            type="button"
+            onClick={() => onSelect(opt.mode)}
+            className="group rounded-2xl bg-white p-6 text-left shadow-sm ring-1 ring-gray-100 transition hover:-translate-y-0.5 hover:shadow-md hover:ring-emerald-300 focus:outline-none focus:ring-2 focus:ring-emerald-400"
+          >
+            <div className="mb-3 text-3xl">{opt.emoji}</div>
+            <h2 className="mb-1 text-lg font-semibold text-gray-900 group-hover:text-emerald-700">{opt.title}</h2>
+            <p className="text-sm text-gray-500">{opt.desc}</p>
+            <p className="mt-3 text-xs text-gray-400">{opt.example}</p>
+          </button>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+// ========================================
+// 📄 2단계 (A): 균등 분배 입력 화면
+// ========================================
+
+function EvenSplitScreen({ data, onChange, onBack, onSubmit, errors }) {
+  const { participants, total, extra } = data;
+
+  return (
+    <div className="mx-auto max-w-2xl">
+      <button type="button" onClick={onBack} className="mb-4 text-sm text-gray-500 hover:text-gray-700">
+        ← 이전으로
+      </button>
+      <Card>
+        <h2 className="mb-4 text-lg font-semibold text-gray-800">균등 분배</h2>
+
+        <div className="space-y-5">
+          <ParticipantEditor
+            participants={participants}
+            onChange={(participants) => onChange({ ...data, participants })}
+          />
+
+          <NumberInput
+            label="총 금액"
+            value={total}
+            onChange={(total) => onChange({ ...data, total })}
+            placeholder="예: 60000"
+          />
+
+          <NumberInput
+            label="추가 비용 (세금·봉사료·배달비 등, 선택)"
+            value={extra}
+            onChange={(extra) => onChange({ ...data, extra })}
+            placeholder="없으면 비워두세요"
+          />
+
+          {errors.length > 0 && (
+            <div className="rounded-lg bg-red-50 p-3 text-sm text-red-600">
+              {errors.map((e, i) => (
+                <div key={i}>· {e}</div>
+              ))}
+            </div>
+          )}
+
+          <Button variant="primary" size="lg" className="w-full" onClick={onSubmit}>
+            계산하기
+          </Button>
+        </div>
+      </Card>
+    </div>
+  );
+}
+
+// ========================================
+// 📄 2단계 (B): 항목별 분배 입력 화면
+// ========================================
+
+function ItemSplitScreen({ data, onChange, onBack, onSubmit, errors }) {
+  const { participants, items, extra } = data;
+
+  const updateItem = (id, patch) => onChange({ ...data, items: items.map((it) => (it.id === id ? { ...it, ...patch } : it)) });
+  const addItem = () => onChange({ ...data, items: [...items, { id: makeId(), name: "", price: "", participantIds: [] }] });
+  const removeItem = (id) => onChange({ ...data, items: items.length > 1 ? items.filter((it) => it.id !== id) : items });
+  const toggleParticipant = (item, pid) => {
+    const has = item.participantIds.includes(pid);
+    const participantIds = has ? item.participantIds.filter((id) => id !== pid) : [...item.participantIds, pid];
+    updateItem(item.id, { participantIds });
+  };
+
+  return (
+    <div className="mx-auto max-w-2xl">
+      <button type="button" onClick={onBack} className="mb-4 text-sm text-gray-500 hover:text-gray-700">
+        ← 이전으로
+      </button>
+      <Card>
+        <h2 className="mb-4 text-lg font-semibold text-gray-800">항목별 분배</h2>
+
+        <div className="space-y-5">
+          <ParticipantEditor
+            participants={participants}
+            onChange={(participants) => onChange({ ...data, participants })}
+          />
+
+          <div>
+            <span className="mb-2 block text-sm font-medium text-gray-700">항목(메뉴)</span>
+            <div className="space-y-3">
+              {items.map((item, idx) => (
+                <div key={item.id} className="rounded-xl border border-gray-200 p-3">
+                  <div className="mb-2 flex items-center gap-2">
+                    <input
+                      type="text"
+                      value={item.name}
+                      onChange={(e) => updateItem(item.id, { name: e.target.value })}
+                      placeholder={`항목 ${idx + 1} 이름 (예: 치킨)`}
+                      className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-emerald-300"
+                    />
+                    <button
+                      type="button"
+                      aria-label="항목 삭제"
+                      onClick={() => removeItem(item.id)}
+                      disabled={items.length <= 1}
+                      className="shrink-0 rounded-lg px-2 py-2 text-gray-400 hover:bg-gray-100 hover:text-red-500 disabled:cursor-not-allowed disabled:opacity-40"
+                    >
+                      ✕
+                    </button>
+                  </div>
+                  <NumberInput
+                    value={item.price}
+                    onChange={(price) => updateItem(item.id, { price })}
+                    placeholder="가격"
+                    className="mb-2"
+                  />
+                  <div className="flex flex-wrap gap-2">
+                    {participants.map((p, pIdx) => {
+                      const active = item.participantIds.includes(p.id);
+                      return (
+                        <button
+                          key={p.id}
+                          type="button"
+                          onClick={() => toggleParticipant(item, p.id)}
+                          className={`rounded-full border px-3 py-1 text-xs transition ${
+                            active
+                              ? "border-emerald-500 bg-emerald-50 text-emerald-700"
+                              : "border-gray-300 bg-white text-gray-500 hover:border-gray-400"
+                          }`}
+                        >
+                          {active ? "✓ " : ""}
+                          {displayName(p, pIdx)}
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+              ))}
+            </div>
+            <Button variant="ghost" size="sm" className="mt-2" onClick={addItem}>
+              + 항목 추가
+            </Button>
+          </div>
+
+          <NumberInput
+            label="추가 비용 (세금·봉사료·배달비 등, 선택)"
+            value={extra}
+            onChange={(extra) => onChange({ ...data, extra })}
+            placeholder="없으면 비워두세요. 각자 먹은 금액 비율대로 나눠 더합니다"
+          />
+
+          {errors.length > 0 && (
+            <div className="rounded-lg bg-red-50 p-3 text-sm text-red-600">
+              {errors.map((e, i) => (
+                <div key={i}>· {e}</div>
+              ))}
+            </div>
+          )}
+
+          <Button variant="primary" size="lg" className="w-full" onClick={onSubmit}>
+            계산하기
+          </Button>
+        </div>
+      </Card>
+    </div>
+  );
+}
+
+// ========================================
+// 📄 3단계: 결과 화면
+// ========================================
+
+function ResultScreen({ result, onEdit, onRestart }) {
+  const sumCheck = result.perPerson.reduce((s, p) => s + p.amount, 0);
+
+  return (
+    <div className="mx-auto max-w-2xl">
+      <Card>
+        <h2 className="mb-1 text-lg font-semibold text-gray-800">정산 결과</h2>
+        <p className="mb-4 text-sm text-gray-500">
+          총 {formatWon(result.total)}을 {result.perPerson.length}명이 나눕니다.
+        </p>
+
+        <div className="space-y-2">
+          {result.perPerson.map((p) => (
+            <div key={p.id} className="flex items-center justify-between rounded-xl bg-gray-50 px-4 py-3">
+              <div>
+                <div className="font-medium text-gray-800">{p.name}</div>
+                {p.breakdown && <div className="text-xs text-gray-400">{p.breakdown}</div>}
+              </div>
+              <div className="text-lg font-bold text-emerald-700">{formatWon(p.amount)}</div>
+            </div>
+          ))}
+        </div>
+
+        <div className="mt-4 flex items-center justify-between border-t border-gray-100 pt-3 text-sm text-gray-400">
+          <span>합계 확인</span>
+          <span>{sumCheck === result.total ? `${formatWon(sumCheck)} ✓ 총액과 일치` : `${formatWon(sumCheck)} (총액과 불일치)`}</span>
+        </div>
+
+        <div className="mt-6 flex gap-3">
+          <Button variant="secondary" size="md" className="flex-1" onClick={onEdit}>
+            입력값 수정하기
+          </Button>
+          <Button variant="primary" size="md" className="flex-1" onClick={onRestart}>
+            다시 계산하기
+          </Button>
+        </div>
+      </Card>
+    </div>
+  );
+}
+
+// ========================================
+// 🚀 App Component
+// ========================================
+
+function App() {
+  const [step, setStep] = useState("select"); // select | inputA | inputB | result
+  const [mode, setMode] = useState(null);
+
+  const [dataA, setDataA] = useState({
+    participants: [
+      { id: makeId(), name: "" },
+      { id: makeId(), name: "" },
+    ],
+    total: "",
+    extra: "",
+  });
+
+  const [dataB, setDataB] = useState({
+    participants: [
+      { id: makeId(), name: "" },
+      { id: makeId(), name: "" },
+    ],
+    items: [{ id: makeId(), name: "", price: "", participantIds: [] }],
+    extra: "",
+  });
+
+  const [errorsA, setErrorsA] = useState([]);
+  const [errorsB, setErrorsB] = useState([]);
+  const [result, setResult] = useState(null);
+
+  const handleSelectMode = (m) => {
+    setMode(m);
+    setStep(m === "A" ? "inputA" : "inputB");
+  };
+
+  const handleBackToSelect = () => setStep("select");
+
+  const handleSubmitA = useCallback(() => {
+    const errs = [];
+    const { participants, total, extra } = dataA;
+    if (participants.length < 1) errs.push("참가자를 1명 이상 추가해주세요.");
+    if (total === "" || Number(total) <= 0) errs.push("총 금액을 입력해주세요.");
+    setErrorsA(errs);
+    if (errs.length > 0) return;
+
+    const totalAmount = Number(total) + Number(extra || 0);
+    const { shares, remainderIndex } = splitEvenlyRandomRemainder(totalAmount, participants.length);
+    const perPerson = participants.map((p, idx) => {
+      const notes = [];
+      if (extra) notes.push(`총액 ${formatWon(total)} + 추가비용 ${formatWon(extra)}`);
+      if (idx === remainderIndex) notes.push("나머지 금액 랜덤 배정");
+      return {
+        id: p.id,
+        name: displayName(p, idx),
+        amount: shares[idx],
+        breakdown: notes.length > 0 ? notes.join(" · ") : null,
+      };
+    });
+
+    setResult({ total: totalAmount, perPerson });
+    setStep("result");
+  }, [dataA]);
+
+  const handleSubmitB = useCallback(() => {
+    const errs = [];
+    const { participants, items, extra } = dataB;
+    if (participants.length < 1) errs.push("참가자를 1명 이상 추가해주세요.");
+    if (items.length < 1) errs.push("항목을 1개 이상 추가해주세요.");
+    items.forEach((it, idx) => {
+      if (it.price === "" || Number(it.price) <= 0) errs.push(`"${it.name || `항목 ${idx + 1}`}"의 가격을 입력해주세요.`);
+      if (it.participantIds.length === 0) errs.push(`"${it.name || `항목 ${idx + 1}`}"을(를) 먹은 사람을 1명 이상 선택해주세요.`);
+    });
+    setErrorsB(errs);
+    if (errs.length > 0) return;
+
+    // 참가자별 항목 합계(subtotal) 계산 — 항목마다 정수 원 단위로 나머지까지 정확히 배분
+    const subtotalMap = {};
+    participants.forEach((p) => (subtotalMap[p.id] = 0));
+
+    items.forEach((item) => {
+      const orderedIds = participants.map((p) => p.id).filter((id) => item.participantIds.includes(id));
+      const shares = splitEvenly(Number(item.price), orderedIds.length);
+      orderedIds.forEach((id, i) => {
+        subtotalMap[id] += shares[i];
+      });
+    });
+
+    const itemsTotal = items.reduce((s, it) => s + Number(it.price), 0);
+    const extraAmount = Number(extra || 0);
+
+    // 추가 비용을 각자의 항목 합계 비율대로 배분 (정수 원 단위).
+    // 소수점 나머지는 여러 명에게 나눠주지 않고, 무작위로 뽑은 한 명에게 통째로 배정한다.
+    const extraMap = {};
+    participants.forEach((p) => (extraMap[p.id] = 0));
+    let extraRemainderIndex = -1;
+
+    if (extraAmount > 0) {
+      if (itemsTotal > 0) {
+        const raw = participants.map((p) => (extraAmount * subtotalMap[p.id]) / itemsTotal);
+        const floors = raw.map((v) => Math.floor(v));
+        const remainder = extraAmount - floors.reduce((s, v) => s + v, 0);
+        const finalShares = [...floors];
+        if (remainder > 0) {
+          extraRemainderIndex = Math.floor(Math.random() * participants.length);
+          finalShares[extraRemainderIndex] += remainder;
+        }
+        participants.forEach((p, idx) => (extraMap[p.id] = finalShares[idx]));
+      } else {
+        const { shares, remainderIndex } = splitEvenlyRandomRemainder(extraAmount, participants.length);
+        extraRemainderIndex = remainderIndex;
+        participants.forEach((p, idx) => (extraMap[p.id] = shares[idx]));
+      }
+    }
+
+    const perPerson = participants.map((p, idx) => {
+      const subtotal = subtotalMap[p.id];
+      const extraShare = extraMap[p.id];
+      const notes = [extraAmount > 0 ? `항목 합계 ${formatWon(subtotal)} + 추가비용 ${formatWon(extraShare)}` : `항목 합계 ${formatWon(subtotal)}`];
+      if (idx === extraRemainderIndex) notes.push("나머지 금액 랜덤 배정");
+      return {
+        id: p.id,
+        name: displayName(p, idx),
+        amount: subtotal + extraShare,
+        breakdown: notes.join(" · "),
+      };
+    });
+
+    setResult({ total: itemsTotal + extraAmount, perPerson });
+    setStep("result");
+  }, [dataB]);
+
+  const handleRestart = () => {
+    setStep("select");
+    setMode(null);
+    setResult(null);
+  };
+
+  const handleEdit = () => {
+    setStep(mode === "A" ? "inputA" : "inputB");
+  };
+
+  return (
+    <div className="min-h-screen px-4 py-10 sm:px-6 lg:px-8">
+      {step === "select" && <ModeSelectScreen onSelect={handleSelectMode} />}
+
+      {step === "inputA" && (
+        <EvenSplitScreen data={dataA} onChange={setDataA} onBack={handleBackToSelect} onSubmit={handleSubmitA} errors={errorsA} />
+      )}
+
+      {step === "inputB" && (
+        <ItemSplitScreen data={dataB} onChange={setDataB} onBack={handleBackToSelect} onSubmit={handleSubmitB} errors={errorsB} />
+      )}
+
+      {step === "result" && result && <ResultScreen result={result} onEdit={handleEdit} onRestart={handleRestart} />}
+    </div>
+  );
+}
+
+// ========================================
+// Rendering
+// ========================================
+
+ReactDOM.createRoot(document.getElementById("root")).render(<App />);
+</script>
+</body>
+</html>

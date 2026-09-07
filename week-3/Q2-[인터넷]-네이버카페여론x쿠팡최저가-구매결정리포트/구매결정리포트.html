@@ -1,0 +1,466 @@
+<title>갤럭시8 구매 판정</title>
+<meta name="description" content="네이버 카페 실사용 후기와 쿠팡 가격·별점 데이터를 교차 검증해 아디다스 갤럭시 8 구매 여부를 판정한 리포트">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Black+Han+Sans&family=Noto+Sans+KR:wght@400;500;600;700;900&family=IBM+Plex+Mono:wght@500;600;700&display=swap">
+<style>
+  :root{
+    --paper:#eef0e8;
+    --panel:#e4e7db;
+    --panel-2:#dadec9;
+    --ink:#20241e;
+    --ink-dim:#5c6355;
+    --line:#c4c9b6;
+    --stamp:#b8262b;
+    --stamp-deep:#7c1418;
+    --stamp-ink-on:#f6ede4;
+    --good:#3e7a4f;
+    --good-bg:#dde9dd;
+    --warn:#a3691a;
+    --warn-bg:#efe2c8;
+    --mono-hi:#5c4a1e;
+    --font-display:"Black Han Sans","Noto Sans KR",sans-serif;
+    --font-body:"Noto Sans KR","Apple SD Gothic Neo",sans-serif;
+    --font-mono:"IBM Plex Mono","Noto Sans KR",monospace;
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --paper:#171a14;
+      --panel:#1f231b;
+      --panel-2:#282d21;
+      --ink:#e9ebe0;
+      --ink-dim:#9aa08e;
+      --line:#3a4032;
+      --stamp:#ff6f63;
+      --stamp-deep:#c94c40;
+      --stamp-ink-on:#1a0e0c;
+      --good:#7bd394;
+      --good-bg:#213329;
+      --warn:#e8b665;
+      --warn-bg:#332a17;
+      --mono-hi:#e8c877;
+    }
+  }
+  :root[data-theme="dark"]{
+    --paper:#171a14;
+    --panel:#1f231b;
+    --panel-2:#282d21;
+    --ink:#e9ebe0;
+    --ink-dim:#9aa08e;
+    --line:#3a4032;
+    --stamp:#ff6f63;
+    --stamp-deep:#c94c40;
+    --stamp-ink-on:#1a0e0c;
+    --good:#7bd394;
+    --good-bg:#213329;
+    --warn:#e8b665;
+    --warn-bg:#332a17;
+    --mono-hi:#e8c877;
+  }
+
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    background:
+      repeating-linear-gradient(to bottom, transparent, transparent 27px, color-mix(in srgb, var(--line) 45%, transparent) 28px),
+      repeating-linear-gradient(to right, transparent, transparent 27px, color-mix(in srgb, var(--line) 25%, transparent) 28px),
+      var(--paper);
+    color:var(--ink);
+    font-family:var(--font-body);
+    line-height:1.65;
+  }
+  h1,h2,h3{text-wrap:balance; font-family:var(--font-display); font-weight:400; letter-spacing:.01em;}
+  .num{font-family:var(--font-mono); font-variant-numeric:tabular-nums;}
+  a{color:inherit;}
+  .wrap{max-width:920px; margin:0 auto; padding:32px 20px 80px;}
+
+  /* ---- masthead / shoebox label ---- */
+  .label{
+    border:2px solid var(--ink);
+    background:var(--panel);
+    padding:22px 24px;
+    display:flex; flex-direction:column; gap:6px;
+    position:relative;
+  }
+  .label::before{
+    content:"";
+    position:absolute; inset:6px;
+    border:1px dashed var(--line);
+    pointer-events:none;
+  }
+  .eyebrow{
+    font-family:var(--font-mono); font-size:.72rem; letter-spacing:.16em; text-transform:uppercase;
+    color:var(--ink-dim);
+  }
+  .title{font-size:2.4rem; margin:2px 0 4px;}
+  .spec-row{
+    display:flex; flex-wrap:wrap; gap:6px 22px;
+    font-family:var(--font-mono); font-size:.82rem; color:var(--ink-dim);
+  }
+  .spec-row b{color:var(--ink); font-weight:600;}
+
+  /* ---- verdict stamp ---- */
+  .verdict{
+    margin-top:28px;
+    display:flex; flex-wrap:wrap; align-items:center; gap:26px;
+    padding:24px;
+    border:1px solid var(--line);
+    background:var(--panel);
+  }
+  .stamp{
+    flex:0 0 auto;
+    width:150px; height:150px;
+    border-radius:50%;
+    border:6px double var(--stamp);
+    color:var(--stamp);
+    display:flex; align-items:center; justify-content:center;
+    transform:rotate(-9deg);
+    font-family:var(--font-display);
+    font-size:2.4rem;
+    letter-spacing:.05em;
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--stamp) 12%, transparent) inset;
+    mix-blend-mode:normal;
+    filter: saturate(1.05);
+  }
+  .verdict-copy{flex:1 1 320px; display:flex; flex-direction:column; gap:10px;}
+  .verdict-copy h2{margin:0; font-size:1.3rem;}
+  .verdict-copy p{margin:0; color:var(--ink-dim);}
+  .caveat{
+    display:inline-flex; align-items:center; gap:8px;
+    background:var(--warn-bg); color:var(--warn);
+    border:1px solid color-mix(in srgb, var(--warn) 40%, transparent);
+    padding:6px 12px; font-size:.86rem; font-weight:600; width:fit-content;
+  }
+
+  /* ---- section framing (perforation divider) ---- */
+  section{margin-top:52px;}
+  .tear{
+    border:none; height:0;
+    border-top:2px dashed var(--line);
+    margin:0 0 26px;
+    position:relative;
+  }
+  .tear::before, .tear::after{
+    content:""; position:absolute; top:-7px;
+    width:14px; height:14px; border-radius:50%;
+    background:var(--paper); border:1px solid var(--line);
+  }
+  .tear::before{left:-7px;}
+  .tear::after{right:-7px;}
+
+  .sec-num{font-family:var(--font-mono); color:var(--stamp); font-weight:700; font-size:.82rem;}
+  section h2{font-size:1.5rem; margin:2px 0 4px;}
+  .sec-note{color:var(--ink-dim); font-size:.92rem; margin:0 0 18px; max-width:64ch;}
+
+  /* ---- tables ---- */
+  .tbl-scroll{overflow-x:auto; border:1px solid var(--line);}
+  table{width:100%; border-collapse:collapse; min-width:640px; background:var(--panel);}
+  th,td{padding:10px 14px; text-align:left; border-bottom:1px solid var(--line); font-size:.9rem;}
+  thead th{
+    font-family:var(--font-mono); font-size:.72rem; letter-spacing:.08em; text-transform:uppercase;
+    color:var(--ink-dim); background:var(--panel-2);
+    border-bottom:1px solid var(--ink);
+  }
+  tbody tr:last-child td{border-bottom:none;}
+  td.num, th.num{text-align:right;}
+  .strike{color:var(--ink-dim); text-decoration:line-through; font-size:.85em;}
+  .price{font-weight:700; color:var(--mono-hi);}
+  .range-row td{background:var(--panel-2); font-weight:600;}
+
+  /* ---- pros/cons ---- */
+  .review-grid{display:grid; grid-template-columns:1fr 1fr; gap:18px;}
+  @media (max-width:640px){.review-grid{grid-template-columns:1fr;}}
+  .review-col{border:1px solid var(--line); background:var(--panel); padding:16px 18px;}
+  .review-col h3{margin:0 0 10px; font-size:1rem; font-family:var(--font-body); font-weight:700;}
+  .review-col.good h3{color:var(--good);}
+  .review-col.bad h3{color:var(--warn);}
+  .review-col ul{margin:0; padding-left:1.1em; display:flex; flex-direction:column; gap:8px; font-size:.92rem;}
+  .src-list{list-style:none; margin:18px 0 0; padding:0; display:flex; flex-direction:column; gap:10px;}
+  .src-list li{
+    font-size:.84rem; color:var(--ink-dim);
+    border-top:1px dotted var(--line); padding-top:8px;
+    display:flex; justify-content:space-between; gap:12px; flex-wrap:wrap;
+  }
+  .src-list b{color:var(--ink); font-weight:600;}
+  .src-list a{font-family:var(--font-mono); font-size:.8rem; word-break:break-all;}
+
+  .callout{
+    margin-top:16px; padding:14px 16px;
+    border-left:3px solid var(--warn);
+    background:var(--warn-bg); color:var(--ink);
+    font-size:.88rem;
+  }
+  .callout b{color:var(--warn);}
+
+  /* ---- cross-check ---- */
+  .chip{
+    display:inline-block; padding:3px 10px; border-radius:999px;
+    font-size:.76rem; font-weight:700; font-family:var(--font-mono);
+    white-space:nowrap;
+  }
+  .chip.match{background:var(--good-bg); color:var(--good);}
+  .chip.partial{background:var(--warn-bg); color:var(--warn);}
+  .chip.diff{background:var(--good-bg); color:var(--stamp-deep); background:color-mix(in srgb, var(--stamp) 16%, transparent);}
+
+  /* ---- criteria ---- */
+  .criteria{display:flex; flex-direction:column; gap:16px;}
+  .crit{border:1px solid var(--line); background:var(--panel); padding:16px 18px;}
+  .crit-head{display:flex; justify-content:space-between; align-items:baseline; gap:10px; flex-wrap:wrap;}
+  .crit-head h3{margin:0; font-size:1rem; font-family:var(--font-body); font-weight:700;}
+  .crit-rank{font-family:var(--font-mono); color:var(--ink-dim); font-size:.78rem;}
+  .bar-track{height:8px; background:var(--panel-2); margin:10px 0 8px; border:1px solid var(--line);}
+  .bar-fill{height:100%; background:var(--stamp);}
+  .crit p{margin:0; font-size:.9rem; color:var(--ink-dim);}
+
+  .conclusion{
+    margin-top:20px; padding:20px 22px;
+    border:1px solid var(--ink);
+    background:var(--panel);
+  }
+  .conclusion p{margin:0 0 10px;}
+  .conclusion p:last-child{margin-bottom:0;}
+
+  footer{
+    margin-top:60px; padding-top:20px; border-top:2px dashed var(--line);
+    font-family:var(--font-mono); font-size:.76rem; color:var(--ink-dim);
+    display:flex; justify-content:space-between; flex-wrap:wrap; gap:8px;
+  }
+</style>
+
+<div class="wrap">
+
+  <div class="label">
+    <span class="eyebrow">구매 결정 리포트 · 러닝화 / 데일리 슈즈</span>
+    <h1 class="title">아디다스 갤럭시 8</h1>
+    <div class="spec-row">
+      <span>모델 <b class="num">KI7980 / IH9812 / IH9795</b></span>
+      <span>정가 <b class="num">79,000원</b></span>
+      <span>미드솔 <b>클라우드폼(Cloudfoam)</b></span>
+      <span>조사기간 <b class="num">2026.09</b></span>
+    </div>
+  </div>
+
+  <div class="verdict">
+    <div class="stamp">산다</div>
+    <div class="verdict-copy">
+      <h2>조건부 구매 추천</h2>
+      <p>데일리 워킹화 · 헬스장 · 5km 이하 가벼운 조깅용으로는 가성비가 확실하다. 카페 여론과 쿠팡 가격·평점 데이터가 겹치는 지점에서 판단했다.</p>
+      <span class="caveat">⚠ 10km 이상 러닝 · 우천 시 착용 목적이면 다른 신발을 권장</span>
+    </div>
+  </div>
+
+  <section>
+    <div class="tear"></div>
+    <div class="sec-num">01 · 가격·별점 비교</div>
+    <h2>쿠팡 판매가 &amp; 리뷰 데이터</h2>
+    <p class="sec-note">2026.09.06 기준 쿠팡 "아디다스 갤럭시8" 검색 결과 상위 노출 상품. 같은 모델도 판매처(옵션)마다 리뷰가 분산 등록되어 있어, 대표 옵션 위주로 정리했다.</p>
+    <div class="tbl-scroll">
+      <table>
+        <thead>
+          <tr><th>상품명</th><th class="num">정가</th><th class="num">판매가</th><th class="num">할인율</th><th class="num">별점</th><th class="num">리뷰수</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>남성용 갤럭시 8 운동화 IH9812</td>
+            <td class="num strike">79,000원</td>
+            <td class="num price">55,300원</td>
+            <td class="num">30%</td>
+            <td class="num">4.5</td>
+            <td class="num">149</td>
+          </tr>
+          <tr>
+            <td>여성용 갤럭시 8 런닝화 IH9795</td>
+            <td class="num strike">79,000원</td>
+            <td class="num price">55,300원</td>
+            <td class="num">30%</td>
+            <td class="num">4.5</td>
+            <td class="num">33</td>
+          </tr>
+          <tr>
+            <td>남성용 갤럭시 8 런닝화 KI7980</td>
+            <td class="num strike">85,000원</td>
+            <td class="num price">71,990원</td>
+            <td class="num">15%</td>
+            <td class="num">4.5</td>
+            <td class="num">40</td>
+          </tr>
+          <tr>
+            <td>남여공용 클라우드폼 데일리 워킹슈즈</td>
+            <td class="num strike">79,000원</td>
+            <td class="num price">47,260원</td>
+            <td class="num">40%</td>
+            <td class="num">4.5</td>
+            <td class="num">11</td>
+          </tr>
+          <tr>
+            <td>여성 갤럭시 8 KH5611</td>
+            <td class="num strike">79,000원</td>
+            <td class="num price">59,950원</td>
+            <td class="num">24%</td>
+            <td class="num">4.0</td>
+            <td class="num">23</td>
+          </tr>
+          <tr>
+            <td>스포츠퍼포먼스 갤럭시 8 KH5611<span style="color:var(--ink-dim)"> (상위 라인)</span></td>
+            <td class="num strike">119,000원</td>
+            <td class="num price">98,500원</td>
+            <td class="num">17%</td>
+            <td class="num">5.0</td>
+            <td class="num">2</td>
+          </tr>
+          <tr class="range-row">
+            <td>관찰 범위 (일반 라인 기준)</td>
+            <td class="num">79,000원</td>
+            <td class="num">47,260 ~ 72,000원</td>
+            <td class="num">10~40%</td>
+            <td class="num">4.0 ~ 5.0</td>
+            <td class="num">1 ~ 149</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="callout">
+      <b>데이터 한계 고지 —</b> 검색 결과 화면에서는 옵션별 별점·리뷰 수가 집계되어 노출되지만, 실제 상품 상세 페이지의 리뷰 위젯에는 텍스트 리뷰가 로드되지 않아("등록된 상품평이 없습니다") 개별 저평점 리뷰의 <b>불만 원문은 확보하지 못했다</b>. 아래 교차 검증은 확보 가능했던 별점·가격 데이터 수준에서만 수행했다.
+    </div>
+  </section>
+
+  <section>
+    <div class="tear"></div>
+    <div class="sec-num">02 · 네이버 카페 후기</div>
+    <h2>실사용자 여론</h2>
+    <p class="sec-note">"아디다스 갤럭시8" 카페 검색 결과 상위 10건 중 6건은 특가 정보 공유 글, 3건은 판매업체의 홍보성 게시물이었다. 아래는 그 중 <b>자비 구매·실사용 정황이 확인된 게시물</b>만 반영했다.</p>
+
+    <div class="review-grid">
+      <div class="review-col good">
+        <h3>장점 · 만족 포인트</h3>
+        <ul>
+          <li><b>가성비</b> — 정가 79,000원, 특가 시 3만원대까지 내려가는 "국민 운동화" 포지션. 맘카페 실사용자도 "이 가격이면 그냥 새로 사는 게 괜찮다"고 재구매.</li>
+          <li><b>착화감</b> — 신는 첫날부터 뒤꿈치 까임 없이 부드럽게 감싸줌(길들이는 시간 불필요).</li>
+          <li><b>사용 용도</b> — 출퇴근 하루 8,000보 걷기 + 헬스장 트레드밀 5km 조깅 겸용으로 무난. "러닝에도 좋지만 데일리로도 잘 신는다"는 반응.</li>
+          <li><b>통기성·경량성</b> — 메쉬 갑피로 발열이 덜하고 무게감이 거의 없음.</li>
+        </ul>
+      </div>
+      <div class="review-col bad">
+        <h3>단점 · 주의할 점</h3>
+        <ul>
+          <li><b>장거리 러닝 부적합</b> — 10km 이상·하프마라톤급에는 미드솔 반발력이 부족. "생활 체육·웰니스용"에 가깝다는 평.</li>
+          <li><b>방수 안 됨</b> — 통기성이 좋은 만큼 우천 시 양말까지 금방 젖음.</li>
+          <li><b>발볼 폭 변화</b> — 전작 갤럭시7 대비 갤럭시8이 발볼이 "아주 살짝" 좁아졌다는 댓글(체감 차이는 크지 않음, 사이즈업 불필요).</li>
+        </ul>
+      </div>
+    </div>
+
+    <ul class="src-list">
+      <li><span><b>맘스홀릭 베이비</b> — "국민운동화 아디다스 갤럭시런 8, 3만원대 떴어요" (댓글 32 · 발볼 비교 논의 포함)</span><a href="https://cafe.naver.com/imsanbu/79984764" target="_blank" rel="noopener">cafe.naver.com/imsanbu/79984764</a></li>
+      <li><span><b>장현·능곡·장곡·시흥맘</b> — "쿠팡 아디다스 갤럭시8 가격 좋네요" (자녀용 구매 후기)</span><a href="https://cafe.naver.com/ls2007/245385" target="_blank" rel="noopener">cafe.naver.com/ls2007/245385</a></li>
+      <li><span><b>개인 블로그(아재감성)</b> — "[내돈내산] 가성비 끝판왕 국민 운동화 솔직 리뷰" (1주일 실착용, 신발 전문 블로거)</span><a href="https://blog.naver.com/bkbkbh/224354823551" target="_blank" rel="noopener">blog.naver.com/bkbkbh/224354823551</a></li>
+      <li><span><b>개인 블로그(공복이의 일상)</b> — "서산 에스마켓 운동화 할인｜온누리상품권 구매 후기" (오프라인 매장 실결제가 58,776원 인증)</span><a href="https://blog.naver.com/sssla00/224381508934" target="_blank" rel="noopener">blog.naver.com/sssla00/224381508934</a></li>
+    </ul>
+
+    <div class="callout">
+      <b>제외한 게시물 —</b> "우리스포츠" 카페의 "아디다스 갤럭시 8 운동화 솔직 후기"는 실제 착용감 서술 없이 "정가/판매처/이미지 8장" 정보만 반복하고 구매 링크로 유도하는 구성이었다. 같은 계정이 같은 날 다른 신발(리스폰스 페이스 등)에도 동일한 템플릿 문구로 "솔직 후기"를 올린 정황이 확인되어 <b>협찬·판매 유도성 게시물로 판단, 집계에서 제외</b>했다.
+    </div>
+  </section>
+
+  <section>
+    <div class="tear"></div>
+    <div class="sec-num">03 · 교차 검증</div>
+    <h2>카페 여론 vs 쿠팡 데이터, 실제로 맞는가</h2>
+    <p class="sec-note">카페에서 언급된 값과 쿠팡에서 관찰된 값을 항목별로 직접 맞대어 봤다.</p>
+    <div class="tbl-scroll">
+      <table>
+        <thead>
+          <tr><th>항목</th><th>카페 쪽 정보</th><th>쿠팡 쪽 정보</th><th>판정</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>정가 기준선</td>
+            <td class="num">79,000원 (소스 4건 공통 언급)</td>
+            <td class="num">79,000원 표기 후 할인 (다수 옵션 공통)</td>
+            <td><span class="chip match">일치</span></td>
+          </tr>
+          <tr>
+            <td>상시 실구매가</td>
+            <td class="num">58,776원 (오프라인 매장, 20%+7% 중복할인)</td>
+            <td class="num">47,260 ~ 72,000원</td>
+            <td><span class="chip match">범위 내 일치</span></td>
+          </tr>
+          <tr>
+            <td>특가 최저가</td>
+            <td class="num">33,000 ~ 38,980원 (핫딜 카페 5건)</td>
+            <td class="num">관찰 최저 47,260원</td>
+            <td><span class="chip diff">불일치 (카페가 20~30% 더 저렴)</span></td>
+          </tr>
+          <tr>
+            <td>사이즈·발볼</td>
+            <td>"정사이즈, 갤럭시7보다 살짝 좁음" (실사용 댓글)</td>
+            <td>리뷰 원문 미확보 → 극단적 저평점 군집 없음</td>
+            <td><span class="chip partial">간접 일치</span></td>
+          </tr>
+          <tr>
+            <td>전반적 만족도</td>
+            <td>긍정 다수, 홍보글 1건 제외 후에도 우호적</td>
+            <td>평균 별점 4.0~4.5 / 5.0 (전 옵션)</td>
+            <td><span class="chip match">일치</span></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="callout">
+      <b>해석 —</b> 가격·만족도 축에서는 두 채널이 서로 검증해준다. 다만 카페의 "핫딜가"는 특정 시점·수량 한정 이벤트가라 쿠팡 상시가보다 낮게 잡히는 게 자연스러운 괴리이지, 품질 불만의 신호는 아니다. 반대로 사이즈 불만처럼 "품질에 대한 이야기"는 카페 쪽에서만 경미하게 확인되고 쿠팡 쪽에서는 리뷰 원문이 막혀 있어 직접 대조가 불가능했다 — 이 지점이 이번 조사의 가장 큰 공백이다.
+    </div>
+  </section>
+
+  <section>
+    <div class="tear"></div>
+    <div class="sec-num">04 · 판단 기준 &amp; 결론</div>
+    <h2>내 기준으로 채점하면</h2>
+    <p class="sec-note">후기가 많다고 사고, 적다고 안 사는 게 아니라 아래 세 가지에 우선순위를 두고 판단했다.</p>
+
+    <div class="criteria">
+      <div class="crit">
+        <div class="crit-head"><h3>1순위 · 가격 대비 만족도</h3><span class="crit-rank">가중치 최상</span></div>
+        <div class="bar-track"><div class="bar-fill" style="width:92%"></div></div>
+        <p>정가 79,000원 대비 실구매가가 55,000~72,000원대, 특가로는 3만원대까지 열려 있다. 카페 실사용자·전문 리뷰 블로거·쿠팡 평점이 모두 이 가격대에서 "가성비 좋다"로 수렴한다. 교차 검증 02·03·05행에서 확인.</p>
+      </div>
+      <div class="crit">
+        <div class="crit-head"><h3>2순위 · 사이즈 이슈 재현성</h3><span class="crit-rank">가중치 중</span></div>
+        <div class="bar-track"><div class="bar-fill" style="width:70%"></div></div>
+        <p>발볼이 "아주 살짝" 좁아졌다는 코멘트가 딱 1개 스레드에서만 나왔고, 그마저도 "큰 차이 없다"는 결론이었다. 여러 독립 소스에서 반복 재현되는 심각한 사이즈 실패담은 발견하지 못했다 — 리스크가 낮다고 판단.</p>
+      </div>
+      <div class="crit">
+        <div class="crit-head"><h3>3순위 · 대안 상품 유무</h3><span class="crit-rank">가중치 하</span></div>
+        <div class="bar-track"><div class="bar-fill" style="width:45%"></div></div>
+        <p>동일 가격대에 뉴발란스·아식스 보급형 라인도 있지만, "아디다스 브랜드 + 클라우드폼 쿠셔닝 + 3만원대 특가"라는 조합을 동시에 만족하는 대안은 조사 범위 내에서 특정하지 못했다. 대체 불가능한 수준은 아니라서 최우선 기준으로 삼지 않았다.</p>
+      </div>
+    </div>
+
+    <div class="conclusion">
+      <p><b>최종 결론: 산다.</b> 단, "10km 이상 전문 러닝화"가 아니라 "데일리·헬스장·가벼운 조깅용 가성비 슈즈"로 산다는 전제다.</p>
+      <p>근거 ① 가격 대비 만족도는 카페·블로그·쿠팡 세 채널이 동시에 긍정 신호를 보냈고(교차 검증 표 1·2·5행), ② 사이즈 관련 불만이 여러 소스에서 반복 재현되지 않아 리스크가 낮으며, ③ 협찬성 게시물 1건을 걸러내고도 남은 실사용 후기의 논조가 바뀌지 않았다는 점에서 여론 자체의 신뢰도도 확인했다.</p>
+      <p>다만 쿠팡 개별 리뷰 원문을 확보하지 못해 "특정 불만이 몇 건 중 몇 건 일치하는지"까지는 검증하지 못했다 — 별점·가격 수준의 교차 검증에 그친다는 한계는 남긴다.</p>
+    </div>
+  </section>
+
+  <footer>
+    <span>아디다스 갤럭시8 구매 결정 리포트</span>
+    <span>작성일 2026.09.06</span>
+  </footer>
+
+  <section style="margin-top:8px;">
+    <div class="tear"></div>
+    <div class="sec-num">05 · 참고 출처</div>
+    <h2>전체 출처 목록</h2>
+    <ul class="src-list">
+      <li><span><b>네이버 카페 검색</b> — "아디다스 갤럭시8" 전체 검색 결과</span><a href="https://section.cafe.naver.com/ca-fe/home/search/articles?q=아디다스 갤럭시8" target="_blank" rel="noopener">section.cafe.naver.com 검색</a></li>
+      <li><span><b>맘스홀릭 베이비</b> — 국민운동화 갤럭시런8 특가 게시글</span><a href="https://cafe.naver.com/imsanbu/79984764" target="_blank" rel="noopener">cafe.naver.com/imsanbu/79984764</a></li>
+      <li><span><b>장현·능곡·장곡·시흥맘</b> — 갤럭시8 구매 공유 게시글</span><a href="https://cafe.naver.com/ls2007/245385" target="_blank" rel="noopener">cafe.naver.com/ls2007/245385</a></li>
+      <li><span><b>우리스포츠 카페(제외됨)</b> — 홍보성 템플릿 게시글, 참고용</span><a href="https://cafe.naver.com/urisports/6911" target="_blank" rel="noopener">cafe.naver.com/urisports/6911</a></li>
+      <li><span><b>블로그 · 아재감성</b> — 내돈내산 1주일 착용 리뷰</span><a href="https://blog.naver.com/bkbkbh/224354823551" target="_blank" rel="noopener">blog.naver.com/bkbkbh/224354823551</a></li>
+      <li><span><b>블로그 · 공복이의 일상</b> — 오프라인 매장 구매 후기</span><a href="https://blog.naver.com/sssla00/224381508934" target="_blank" rel="noopener">blog.naver.com/sssla00/224381508934</a></li>
+      <li><span><b>쿠팡</b> — "아디다스 갤럭시8" 검색 결과 전체</span><a href="https://www.coupang.com/np/search?q=아디다스 갤럭시8" target="_blank" rel="noopener">coupang.com 검색</a></li>
+      <li><span><b>쿠팡</b> — 남성용 갤럭시 8 운동화 IH9812 (별점 4.5 · 리뷰 149)</span><a href="https://www.coupang.com/vp/products/9609906182" target="_blank" rel="noopener">coupang.com/vp/products/9609906182</a></li>
+      <li><span><b>아디다스 공식 스토어</b> — 갤럭시 8 KI7980 정가 확인</span><a href="https://www.adidas.co.kr/갤럭시-8/KI7980.html" target="_blank" rel="noopener">adidas.co.kr</a></li>
+    </ul>
+  </section>
+
+</div>

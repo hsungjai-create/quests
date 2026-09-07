@@ -1,0 +1,292 @@
+:root {
+  --lego-red: #d5171f;
+  --lego-yellow: #ffcd00;
+  --lego-blue: #0060a9;
+  --lego-green: #237a3f;
+  --lego-dark: #1c1c1c;
+}
+
+.app {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 24px 16px 64px;
+}
+
+.app-header {
+  text-align: center;
+  margin-bottom: 24px;
+}
+
+.app-title {
+  color: var(--lego-yellow);
+  font-size: 2rem;
+  letter-spacing: 1px;
+  margin: 0 0 4px;
+  text-shadow: 2px 2px 0 var(--lego-red);
+}
+
+.app-subtitle {
+  color: #eee;
+  margin: 0 0 16px;
+  font-weight: 600;
+}
+
+/* 브릭(레고) 느낌의 카드: 각진 모서리 + 두꺼운 테두리 + 스터드(돌기) 장식 */
+.brick-card {
+  position: relative;
+  background: #f4f4f0;
+  border: 4px solid var(--lego-dark);
+  border-radius: 4px;
+  padding: 20px;
+  margin-bottom: 20px;
+  box-shadow: 6px 6px 0 var(--lego-dark);
+}
+
+.brick-card::before {
+  content: '';
+  position: absolute;
+  top: -10px;
+  left: 24px;
+  width: 18px;
+  height: 18px;
+  background: inherit;
+  border: 4px solid var(--lego-dark);
+  border-radius: 50%;
+}
+
+.style-card {
+  background: var(--lego-yellow);
+  text-align: left;
+}
+
+.style-name {
+  margin: 0 0 8px;
+  font-weight: 800;
+  font-size: 1.1rem;
+  color: var(--lego-red);
+}
+
+.style-description {
+  margin: 0;
+  font-size: 0.9rem;
+  line-height: 1.5;
+  color: #222;
+}
+
+.settings-card {
+  background: #eaf7ea;
+}
+
+.settings-summary {
+  cursor: pointer;
+  font-weight: 800;
+  color: var(--lego-green);
+  list-style: none;
+}
+
+.settings-summary::-webkit-details-marker {
+  display: none;
+}
+
+.settings-form {
+  margin-top: 14px;
+}
+
+.settings-hint {
+  font-size: 0.82rem;
+  line-height: 1.5;
+  color: #333;
+  margin: 0 0 12px;
+}
+
+.settings-row {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-bottom: 12px;
+}
+
+.settings-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.ghost-button {
+  background: #fff;
+  color: var(--lego-dark);
+}
+
+.settings-saved {
+  color: var(--lego-green);
+  font-weight: 700;
+  font-size: 0.85rem;
+}
+
+.prompt-form {
+  background: #fff;
+}
+
+.prompt-label {
+  display: block;
+  font-weight: 700;
+  margin-bottom: 10px;
+}
+
+.prompt-row {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.prompt-input {
+  flex: 1 1 220px;
+  min-width: 0;
+  padding: 12px;
+  border: 3px solid var(--lego-dark);
+  border-radius: 2px;
+  font-size: 1rem;
+}
+
+.prompt-input:disabled {
+  background: #eee;
+}
+
+.brick-button {
+  display: inline-block;
+  background: var(--lego-blue);
+  color: #fff;
+  border: 3px solid var(--lego-dark);
+  border-radius: 2px;
+  padding: 12px 20px;
+  font-weight: 800;
+  font-size: 1rem;
+  cursor: pointer;
+  box-shadow: 3px 3px 0 var(--lego-dark);
+  transition: transform 0.1s ease;
+  text-decoration: none;
+  text-align: center;
+}
+
+.brick-button:hover:not(:disabled) {
+  transform: translate(1px, 1px);
+  box-shadow: 2px 2px 0 var(--lego-dark);
+}
+
+.brick-button:disabled {
+  background: #999;
+  cursor: not-allowed;
+  box-shadow: none;
+}
+
+.warning-text {
+  color: var(--lego-red);
+  font-weight: 700;
+  margin: 10px 0 0;
+}
+
+.result-card {
+  background: #fff;
+  text-align: center;
+}
+
+.result-state {
+  padding: 40px 20px;
+  color: #444;
+  font-weight: 600;
+}
+
+.error-card {
+  background: #ffe3e3;
+  color: var(--lego-red);
+}
+
+.placeholder-card {
+  background: #eef4ff;
+}
+
+.spinner {
+  width: 40px;
+  height: 40px;
+  margin: 0 auto 16px;
+  border: 6px solid var(--lego-yellow);
+  border-top-color: var(--lego-red);
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.result-image {
+  width: 100%;
+  max-width: 512px;
+  border: 4px solid var(--lego-dark);
+  border-radius: 2px;
+  margin-bottom: 16px;
+}
+
+.final-prompt {
+  text-align: left;
+  font-size: 0.85rem;
+  line-height: 1.5;
+  background: #f4f4f0;
+  border: 2px dashed var(--lego-dark);
+  padding: 12px;
+  margin-bottom: 16px;
+}
+
+.download-button {
+  background: var(--lego-green);
+}
+
+.history-section {
+  margin-top: 32px;
+}
+
+.history-title {
+  color: #eee;
+  font-size: 1.1rem;
+  margin-bottom: 12px;
+}
+
+.history-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(90px, 1fr));
+  gap: 12px;
+}
+
+.history-thumb {
+  padding: 0;
+  border: 3px solid var(--lego-dark);
+  border-radius: 2px;
+  overflow: hidden;
+  cursor: pointer;
+  background: #fff;
+  aspect-ratio: 1 / 1;
+}
+
+.history-thumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+@media (max-width: 480px) {
+  .app-title {
+    font-size: 1.5rem;
+  }
+
+  .prompt-row {
+    flex-direction: column;
+  }
+
+  .brick-button {
+    width: 100%;
+  }
+}

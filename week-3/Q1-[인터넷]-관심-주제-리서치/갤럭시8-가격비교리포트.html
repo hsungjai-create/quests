@@ -1,0 +1,600 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>갤럭시 8 가격 리포트</title>
+<meta name="description" content="KREAM·ABC마트·아디다스 공식몰의 갤럭시 8 가격을 비교한 조사 리포트">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@600;700;800&family=IBM+Plex+Sans+KR:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500;600&display=swap">
+<style>
+  :root{
+    --paper:#EEF0EA;
+    --paper-raised:#FFFFFF;
+    --ink:#1A1D19;
+    --ink-soft:#586257;
+    --ink-faint:#8B9186;
+    --accent:#E8501C;
+    --accent-ink:#FFFFFF;
+    --good:#2F8F5B;
+    --good-bg:#E3F1E7;
+    --line:#D7DACE;
+    --line-strong:#B9BEAE;
+    --shadow:0 1px 2px rgba(26,29,25,.06), 0 8px 24px -12px rgba(26,29,25,.18);
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --paper:#15170F;
+      --paper-raised:#1D2016;
+      --ink:#ECEFE6;
+      --ink-soft:#A6AC9B;
+      --ink-faint:#767C6D;
+      --accent:#FF7A3D;
+      --accent-ink:#191305;
+      --good:#59C689;
+      --good-bg:rgba(89,198,137,.14);
+      --line:#33362A;
+      --line-strong:#454A38;
+      --shadow:0 1px 2px rgba(0,0,0,.4), 0 12px 28px -14px rgba(0,0,0,.6);
+    }
+  }
+  :root[data-theme="dark"]{
+    --paper:#15170F;
+    --paper-raised:#1D2016;
+    --ink:#ECEFE6;
+    --ink-soft:#A6AC9B;
+    --ink-faint:#767C6D;
+    --accent:#FF7A3D;
+    --accent-ink:#191305;
+    --good:#59C689;
+    --good-bg:rgba(89,198,137,.14);
+    --line:#33362A;
+    --line-strong:#454A38;
+    --shadow:0 1px 2px rgba(0,0,0,.4), 0 12px 28px -14px rgba(0,0,0,.6);
+  }
+
+  *{box-sizing:border-box;}
+  body{
+    background:var(--paper);
+    color:var(--ink);
+    font-family:"IBM Plex Sans KR","IBM Plex Sans",-apple-system,sans-serif;
+    line-height:1.6;
+    -webkit-font-smoothing:antialiased;
+  }
+  .wrap{
+    max-width:840px;
+    margin:0 auto;
+    padding:56px 24px 80px;
+  }
+  .mono{ font-family:"IBM Plex Mono",ui-monospace,monospace; font-variant-numeric:tabular-nums; }
+
+  /* ---------- Header ---------- */
+  header{
+    display:flex;
+    flex-direction:column;
+    gap:14px;
+    padding-bottom:32px;
+    margin-bottom:40px;
+    border-bottom:1px solid var(--line);
+  }
+  .eyebrow{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    font-size:12.5px;
+    font-weight:600;
+    letter-spacing:.14em;
+    text-transform:uppercase;
+    color:var(--ink-soft);
+  }
+  .eyebrow .dot{
+    width:7px;height:7px;border-radius:50%;
+    background:var(--accent);
+    box-shadow:0 0 0 3px color-mix(in srgb, var(--accent) 22%, transparent);
+    flex:none;
+  }
+  h1{
+    font-family:"Big Shoulders Display",sans-serif;
+    font-weight:800;
+    font-stretch:condensed;
+    font-size:clamp(40px,7vw,64px);
+    line-height:.98;
+    letter-spacing:.005em;
+    margin:0;
+    text-wrap:balance;
+  }
+  h1 span{ color:var(--accent); }
+  .dek{
+    max-width:56ch;
+    color:var(--ink-soft);
+    font-size:16px;
+  }
+  .meta-row{
+    display:flex;
+    flex-wrap:wrap;
+    gap:8px 22px;
+    margin-top:6px;
+    font-size:12.5px;
+    color:var(--ink-faint);
+  }
+  .meta-row b{ color:var(--ink-soft); font-weight:600; }
+
+  /* ---------- Section titles ---------- */
+  .section-title{
+    font-family:"Big Shoulders Display",sans-serif;
+    font-weight:700;
+    font-size:22px;
+    letter-spacing:.01em;
+    margin:0 0 4px;
+  }
+  .section-note{
+    color:var(--ink-faint);
+    font-size:13px;
+    margin:0 0 20px;
+  }
+  section{ margin-bottom:52px; }
+
+  /* ---------- Visit evidence ---------- */
+  .visit-grid{
+    display:grid;
+    grid-template-columns:repeat(3,1fr);
+    gap:14px;
+  }
+  @media (max-width:640px){ .visit-grid{ grid-template-columns:1fr; } }
+  .visit-card{
+    background:var(--paper-raised);
+    border:1px solid var(--line);
+    border-radius:10px;
+    overflow:hidden;
+    box-shadow:var(--shadow);
+    display:flex;
+    flex-direction:column;
+  }
+  .visit-card .shot{
+    aspect-ratio:16/11;
+    overflow:hidden;
+    background:var(--paper);
+    border-bottom:1px solid var(--line);
+  }
+  .visit-card .shot img{
+    width:100%;
+    height:100%;
+    object-fit:cover;
+    object-position:top;
+    display:block;
+  }
+  .visit-card .cap{ padding:12px 14px 14px; }
+  .visit-card .cap .site{ font-size:13px; font-weight:700; }
+  .visit-card .cap .url{ font-size:11.5px; color:var(--ink-faint); font-family:"IBM Plex Mono",monospace; margin-top:2px; word-break:break-all; }
+  .visit-card .cap .ts{ font-size:11px; color:var(--ink-faint); margin-top:6px; }
+
+  /* ---------- Channel cards ---------- */
+  .channels{
+    display:grid;
+    grid-template-columns:repeat(3,1fr);
+    gap:14px;
+  }
+  @media (max-width:640px){ .channels{ grid-template-columns:1fr; } }
+  .channel{
+    background:var(--paper-raised);
+    border:1px solid var(--line);
+    border-radius:10px;
+    padding:20px 18px;
+    box-shadow:var(--shadow);
+    display:flex;
+    flex-direction:column;
+    gap:10px;
+    position:relative;
+  }
+  .channel.best{ border-color:var(--good); }
+  .badge-best{
+    position:absolute;
+    top:-11px;
+    right:16px;
+    background:var(--good);
+    color:#08150E;
+    font-size:11px;
+    font-weight:700;
+    letter-spacing:.04em;
+    padding:3px 9px;
+    border-radius:999px;
+  }
+  .channel .store{
+    font-size:13px;
+    font-weight:600;
+    color:var(--ink-soft);
+  }
+  .channel .variant{
+    font-size:12.5px;
+    color:var(--ink-faint);
+    min-height:2.6em;
+  }
+  .channel .price-row{
+    display:flex;
+    align-items:baseline;
+    gap:8px;
+    margin-top:2px;
+  }
+  .channel .price{
+    font-family:"Big Shoulders Display",sans-serif;
+    font-weight:800;
+    font-size:30px;
+    letter-spacing:.01em;
+  }
+  .channel .list-price{
+    font-size:12.5px;
+    color:var(--ink-faint);
+    text-decoration:line-through;
+  }
+  .channel .discount{
+    font-size:12px;
+    font-weight:600;
+    color:var(--accent);
+  }
+  .bar-track{
+    height:5px;
+    border-radius:3px;
+    background:var(--line);
+    overflow:hidden;
+    margin-top:4px;
+  }
+  .bar-fill{ height:100%; border-radius:3px; background:var(--accent); }
+  .channel.best .bar-fill{ background:var(--good); }
+
+  /* ---------- Table ---------- */
+  .table-scroll{ overflow-x:auto; border:1px solid var(--line); border-radius:10px; background:var(--paper-raised); box-shadow:var(--shadow); }
+  table{ width:100%; border-collapse:collapse; min-width:640px; }
+  thead th{
+    text-align:left;
+    font-size:11.5px;
+    font-weight:600;
+    letter-spacing:.06em;
+    text-transform:uppercase;
+    color:var(--ink-faint);
+    padding:13px 16px;
+    border-bottom:1px solid var(--line);
+    white-space:nowrap;
+  }
+  tbody td{
+    padding:14px 16px;
+    border-bottom:1px solid var(--line);
+    font-size:14px;
+    vertical-align:top;
+  }
+  tbody tr:last-child td{ border-bottom:none; }
+  td.num{ text-align:right; font-family:"IBM Plex Mono",monospace; font-variant-numeric:tabular-nums; white-space:nowrap; }
+  td .store-name{ font-weight:600; }
+  td .sub{ display:block; color:var(--ink-faint); font-size:12px; margin-top:2px; }
+  .pill{
+    display:inline-block;
+    font-size:11px;
+    font-weight:600;
+    padding:2px 8px;
+    border-radius:999px;
+    background:var(--good-bg);
+    color:var(--good);
+    white-space:nowrap;
+  }
+  .pill.flat{ background:var(--line); color:var(--ink-soft); }
+  .pill.diff{ background:color-mix(in srgb, var(--accent) 16%, transparent); color:var(--accent); }
+
+  /* ---------- Legend ---------- */
+  .legend{
+    display:flex;
+    flex-wrap:wrap;
+    gap:16px;
+    margin:0 0 16px;
+    font-size:12.5px;
+    color:var(--ink-soft);
+  }
+  .legend span{ display:inline-flex; align-items:center; gap:6px; }
+
+  /* ---------- Resale note ---------- */
+  .resale-list{
+    display:grid;
+    grid-template-columns:repeat(2,1fr);
+    gap:8px 20px;
+    list-style:none;
+    margin:14px 0 0;
+    padding:0;
+    font-size:13.5px;
+  }
+  @media (max-width:640px){ .resale-list{ grid-template-columns:1fr; } }
+  .resale-list li{
+    display:flex;
+    justify-content:space-between;
+    gap:12px;
+    padding:9px 0;
+    border-bottom:1px dashed var(--line);
+  }
+  .resale-list .rn{ color:var(--ink-soft); }
+  .resale-list .rp{ font-family:"IBM Plex Mono",monospace; font-variant-numeric:tabular-nums; font-weight:600; }
+
+  /* ---------- Conclusion ---------- */
+  .conclusion{
+    background:var(--paper-raised);
+    border:1px solid var(--line-strong);
+    border-left:4px solid var(--accent);
+    border-radius:10px;
+    padding:26px 26px 24px;
+    box-shadow:var(--shadow);
+  }
+  .conclusion h2{
+    font-family:"Big Shoulders Display",sans-serif;
+    font-weight:700;
+    font-size:22px;
+    margin:0 0 12px;
+  }
+  .conclusion p{ margin:0 0 12px; color:var(--ink); font-size:14.5px; }
+  .conclusion p:last-child{ margin-bottom:0; }
+  .conclusion strong{ color:var(--accent); }
+  .rec-grid{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:12px;
+    margin:16px 0;
+  }
+  @media (max-width:640px){ .rec-grid{ grid-template-columns:1fr; } }
+  .rec{
+    background:var(--paper);
+    border:1px solid var(--line);
+    border-radius:8px;
+    padding:14px 16px;
+  }
+  .rec .who{ font-size:12px; font-weight:700; letter-spacing:.04em; text-transform:uppercase; color:var(--ink-faint); margin-bottom:5px; }
+  .rec .what{ font-size:13.5px; color:var(--ink); }
+
+  footer{
+    margin-top:56px;
+    padding-top:20px;
+    border-top:1px solid var(--line);
+    font-size:12px;
+    color:var(--ink-faint);
+    display:flex;
+    flex-wrap:wrap;
+    justify-content:space-between;
+    gap:8px;
+  }
+</style>
+</head>
+<body>
+
+<div class="wrap">
+
+  <header>
+    <div class="eyebrow"><span class="dot"></span>가격 조사 리포트 · 2026-09-06 실시간 수집</div>
+    <h1>아디다스 <span>갤럭시 8</span><br>3사 가격 비교</h1>
+    <p class="dek">아디다스 공식 온라인 스토어, ABC마트, 리셀 플랫폼 KREAM에서 러닝화 &ldquo;갤럭시 8&rdquo;의 판매가를 각각 직접 접속해 조사했습니다. 세 곳 모두 가격 확인 과정에서 로그인 요구 없이 열람 가능했습니다.</p>
+    <div class="meta-row">
+      <span><b>조사 모델</b> KI7980 (Core Black 계열)</span>
+      <span><b>조사 방식</b> Playwright 브라우저 자동화로 3개 사이트 직접 접속</span>
+      <span><b>통화</b> KRW</span>
+    </div>
+  </header>
+
+  <section>
+    <p class="section-title">실제 방문 캡처</p>
+    <p class="section-note">Playwright로 각 사이트의 상품 상세 페이지에 직접 접속해 촬영한 화면 (로그인 화면 없음)</p>
+    <div class="visit-grid">
+      <div class="visit-card">
+        <div class="shot"><img src="images/1_adidas_official.png" alt="아디다스 공식몰 갤럭시 8 상품 페이지 캡처"></div>
+        <div class="cap">
+          <div class="site">아디다스 공식 온라인 스토어</div>
+          <div class="url">adidas.co.kr/갤럭시-8/KI7980.html</div>
+          <div class="ts">79,000원 · Black</div>
+        </div>
+      </div>
+      <div class="visit-card">
+        <div class="shot"><img src="images/2_abcmart.png" alt="ABC마트 갤럭시 8 상품 페이지 캡처"></div>
+        <div class="cap">
+          <div class="site">ABC마트</div>
+          <div class="url">abcmart.a-rt.com/product (KH5609)</div>
+          <div class="ts">79,000원 · Cloud White/Dark Blue</div>
+        </div>
+      </div>
+      <div class="visit-card">
+        <div class="shot"><img src="images/3_kream.png" alt="KREAM 갤럭시 8 상품 페이지 캡처"></div>
+        <div class="cap">
+          <div class="site">KREAM (리셀)</div>
+          <div class="url">kream.co.kr/products/948761</div>
+          <div class="ts">52,000원 · Core Black/Grey Six/Carbon</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <p class="section-title">채널별 대표가</p>
+    <p class="section-note">동일 모델(KI7980, 블랙 계열) 기준 · 정가 대비 막대 길이로 표시</p>
+    <div class="channels">
+
+      <div class="channel">
+        <span class="store">아디다스 공식 온라인 스토어</span>
+        <span class="variant">갤럭시 8 · Black</span>
+        <div class="price-row"><span class="price mono">79,000원</span></div>
+        <span class="discount">정가 · 할인 없음</span>
+        <div class="bar-track"><div class="bar-fill" style="width:100%"></div></div>
+      </div>
+
+      <div class="channel">
+        <span class="store">ABC마트</span>
+        <span class="variant">갤럭시 8 M (남성) / 여성 동일가</span>
+        <div class="price-row"><span class="price mono">79,000원</span></div>
+        <span class="discount">정가 · 할인 없음</span>
+        <div class="bar-track"><div class="bar-fill" style="width:100%"></div></div>
+      </div>
+
+      <div class="channel best">
+        <span class="badge-best">최저가</span>
+        <span class="store">KREAM (리셀)</span>
+        <span class="variant">코어 블랙 그레이 식스 · 즉시구매가</span>
+        <div class="price-row">
+          <span class="price mono">52,000원</span>
+          <span class="list-price mono">79,000원</span>
+        </div>
+        <span class="discount">발매가 대비 34% ↓</span>
+        <div class="bar-track"><div class="bar-fill" style="width:65.8%"></div></div>
+      </div>
+
+    </div>
+  </section>
+
+  <section>
+    <p class="section-title">상세 비교표</p>
+    <p class="section-note">각 사이트에서 확인한 원본 표기 그대로 기록</p>
+    <div class="table-scroll">
+      <table>
+        <thead>
+          <tr>
+            <th>판매처</th>
+            <th>상품 / 컬러웨이</th>
+            <th style="text-align:right">정가(발매가)</th>
+            <th style="text-align:right">현재 판매가</th>
+            <th>비고</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><span class="store-name">아디다스 공식몰</span><span class="sub">adidas.co.kr</span></td>
+            <td>갤럭시 8 &ndash; Black<span class="sub">모델번호 KI7980</span></td>
+            <td class="num">79,000원</td>
+            <td class="num">79,000원</td>
+            <td><span class="pill flat">정가 판매</span> 즉시 배송, 공식 A/S</td>
+          </tr>
+          <tr>
+            <td><span class="store-name">ABC마트</span><span class="sub">abcmart.a-rt.com</span></td>
+            <td>갤럭시 8 (남성)<span class="sub">갤럭시 8 EL(주니어) 59,000원 / 인펀트 49,000원도 별도 판매</span></td>
+            <td class="num">79,000원</td>
+            <td class="num">79,000원</td>
+            <td><span class="pill flat">정가 판매</span> 매장 픽업·교환 가능</td>
+          </tr>
+          <tr>
+            <td><span class="store-name">KREAM</span><span class="sub">kream.co.kr</span></td>
+            <td>코어 블랙 그레이 식스<span class="sub">모델번호 KI7980 · 거래 57건, 리뷰 5.0(6건)</span></td>
+            <td class="num">79,000원</td>
+            <td class="num">52,000원</td>
+            <td><span class="pill">34%↓ 최저가</span> 검수 수수료 없음, 배송비 3,000원 별도</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <p class="section-note" style="margin-top:22px;">참고 &middot; KREAM에 등록된 다른 컬러웨이 즉시구매가 (동일 발매가 79,000원 기준)</p>
+    <ul class="resale-list">
+      <li><span class="rn">코어 블랙 클라우드 화이트</span><span class="rp">46,000원 (41%↓)</span></li>
+      <li><span class="rn">화이트 틴트 그레이 파이브</span><span class="rp">52,000원 (34%↓)</span></li>
+      <li><span class="rn">(W) 코어 블랙 매트 실버</span><span class="rp">54,000원 (32%↓)</span></li>
+      <li><span class="rn">(W) 클라우드 화이트 블리스 라일락</span><span class="rp">79,000원 (할인 없음)</span></li>
+    </ul>
+  </section>
+
+  <section>
+    <p class="section-title">상품 설명 비교</p>
+    <p class="section-note">각 사이트의 상품 상세 페이지에 실제로 기재된 항목만 기준으로 비교 · 공식몰은 KI7980(Black), ABC마트는 검색 결과 상위 노출 상품인 KH5609 기준</p>
+    <div class="legend">
+      <span><span class="pill" style="padding:2px 8px;">공통</span> 세 사이트 모두 동일하게 제공</span>
+      <span><span class="pill flat" style="padding:2px 8px;">부분 일치</span> 요소는 겹치나 표현 방식이 다름</span>
+      <span><span class="pill diff" style="padding:2px 8px;">차이</span> 사이트별로 유무·내용이 다름</span>
+    </div>
+    <div class="table-scroll">
+      <table>
+        <thead>
+          <tr>
+            <th>항목</th>
+            <th>아디다스 공식몰</th>
+            <th>ABC마트</th>
+            <th>KREAM</th>
+            <th>비교</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><span class="store-name">상품명 표기</span></td>
+            <td>&ldquo;갤럭시 8&rdquo; (컬러는 페이지 타이틀에 &ldquo;- Black&rdquo;로 별도 표기)</td>
+            <td>&ldquo;갤럭시 8 / GALAXY 8 M&rdquo; 국문&middot;영문 병기, 성별 구분자 포함</td>
+            <td>&ldquo;아디다스 갤럭시 8 코어 블랙 그레이 식스&rdquo; 브랜드&middot;모델명&middot;컬러명을 한 줄로 결합</td>
+            <td><span class="pill diff">차이</span></td>
+          </tr>
+          <tr>
+            <td><span class="store-name">기본 노출 컬러웨이 / 스타일코드</span></td>
+            <td>Black · <span class="mono">KI7980</span></td>
+            <td>Cloud White/Dark Blue/Cloud White · <span class="mono">KH5609</span></td>
+            <td>Core Black/Grey Six/Carbon · <span class="mono">KI7980</span></td>
+            <td><span class="pill diff">차이</span></td>
+          </tr>
+          <tr>
+            <td><span class="store-name">마케팅 설명 문구</span></td>
+            <td>있음 &mdash; &ldquo;클라우드폼 쿠셔닝 기술이 적용되어&hellip;&rdquo; 등 스토리텔링 문단 제공</td>
+            <td>없음 &mdash; 전자상거래법 상품정보제공고시 표만 제공</td>
+            <td>없음 &mdash; 브랜드&middot;모델명 외 설명 문구 미제공</td>
+            <td><span class="pill diff">차이</span></td>
+          </tr>
+          <tr>
+            <td><span class="store-name">소재 · 사양 정보</span></td>
+            <td>상세 &mdash; 갑피(섬유/기타소재), 안감(섬유), 창(기타소재), 중량 326g, 미드솔 드롭 5mm</td>
+            <td>간략 &mdash; 소재 &ldquo;폴리에스터&rdquo;, 굽높이 4.8cm (법정 고시 기준)</td>
+            <td>미제공</td>
+            <td><span class="pill diff">차이</span></td>
+          </tr>
+          <tr>
+            <td><span class="store-name">제조사 · 원산지</span></td>
+            <td>미표기</td>
+            <td>제조자 아디다스코리아 · 제조국 인도네시아 · 제조년월 안내</td>
+            <td>미표기</td>
+            <td><span class="pill diff">차이</span></td>
+          </tr>
+          <tr>
+            <td><span class="store-name">사이즈 안내</span></td>
+            <td>mm 단위 사이즈 버튼(220&ndash;) 제공</td>
+            <td>mm 단위 + 구매자 통계(&ldquo;정사이즈 100%&rdquo;)</td>
+            <td>mm + KR/US(M)/US(W)/UK/JP 국가별 환산표</td>
+            <td><span class="pill flat">부분 일치</span></td>
+          </tr>
+          <tr>
+            <td><span class="store-name">정품 · 보증 안내</span></td>
+            <td>별도 문구 없음 (공식 리테일 기본 신뢰)</td>
+            <td>품질보증기준(구입일로부터 6개월), 교환/반품 규정 명시</td>
+            <td>&ldquo;100% 정품 보증 · 전문가 책임 검수 · 가품 3배 보상&rdquo; 리셀 특유 강조 문구</td>
+            <td><span class="pill diff">차이</span></td>
+          </tr>
+          <tr>
+            <td><span class="store-name">구매자 리뷰</span></td>
+            <td>리뷰 기능 없음</td>
+            <td>상품후기 4건</td>
+            <td>일반 리뷰 6건(평점 5.0) + 스타일 리뷰 + 정사이즈/착화감/발볼 통계</td>
+            <td><span class="pill diff">차이</span></td>
+          </tr>
+          <tr>
+            <td><span class="store-name">가격 표시 방식</span></td>
+            <td>정가만 단일 표기</td>
+            <td>정가 + 회원 등급별 적립·카드 혜택 표</td>
+            <td>발매가 + 즉시구매가 + 최근 체결가 추이(사이즈별)</td>
+            <td><span class="pill diff">차이</span></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="section-note" style="margin-top:22px;">요약 &middot; 9개 항목 중 완전히 동일한 항목은 없었습니다. 사이즈 안내만 &ldquo;mm 단위 표기&rdquo;라는 요소를 공유할 뿐 상세도가 다르고, 나머지는 사이트 성격(공식 리테일 / 멀티브랜드 리테일 / 리셀 마켓)에 따라 있고 없음이 갈립니다. 공식몰은 제품 스토리와 기술 사양에, ABC마트는 법정 고시와 매장 서비스에, KREAM은 실거래 시세와 정품 검수·리뷰에 각각 무게를 두고 있습니다.</p>
+  </section>
+
+  <section style="margin-bottom:0;">
+    <div class="conclusion">
+      <h2>결론</h2>
+      <p>공식몰과 ABC마트는 <strong>79,000원</strong> 정가로 완전히 동일하며, 두 채널 모두 조사 시점에 별도 할인이 적용되지 않았습니다. 반면 리셀 플랫폼 KREAM은 같은 모델(KI7980)을 <strong>52,000원</strong>에 즉시구매할 수 있어 정가 대비 <strong>약 34% 저렴</strong>했고, 컬러웨이에 따라서는 최대 41%까지 격차가 벌어졌습니다.</p>
+      <p>다만 KREAM의 즉시구매가는 사이즈·재고에 따라 실시간으로 변동됩니다(조사 시점 최근 체결가는 250mm 59,000원, 270mm·275mm·280mm 52,000원). 정가 채널은 가격이 고정적이고 즉시 매장 교환·환불이 쉬운 반면, KREAM은 검수를 거친 정품이지만 배송비(3,000원)가 별도로 붙고 원하는 사이즈의 매물이 없을 수 있습니다.</p>
+      <div class="rec-grid">
+        <div class="rec"><div class="who">최저가가 최우선이라면</div><div class="what">KREAM에서 원하는 사이즈의 즉시구매가를 먼저 확인 &mdash; 정가보다 최대 41%까지 저렴합니다.</div></div>
+        <div class="rec"><div class="who">확실한 재고·교환이 필요하다면</div><div class="what">ABC마트 또는 공식몰에서 정가로 구매 &mdash; 가격 차이는 없으니 배송·매장 접근성으로 선택하면 됩니다.</div></div>
+      </div>
+      <p>세 사이트 모두 가격 정보를 확인하는 과정에서 로그인 화면이 나타나지 않아 비회원 상태로 조사를 완료했습니다.</p>
+    </div>
+  </section>
+
+  <footer>
+    <span>조사 도구: Playwright 브라우저 자동화 (실시간 직접 접속, 3개 사이트 방문)</span>
+    <span>수집일 2026-09-06 · 가격은 사이트 정책에 따라 변동될 수 있음</span>
+  </footer>
+
+</div>
+</body>
+</html>

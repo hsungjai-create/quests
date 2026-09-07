@@ -1,0 +1,342 @@
+<meta charset="UTF-8">
+<title>쿠팡 러닝화 TOP 5 비교표</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Song+Myung&family=Noto+Sans+KR:wght@400;500;700;900&family=JetBrains+Mono:wght@500;700&display=swap');
+
+  :root{
+    --ink:#211D18;
+    --ink-soft:#5A5347;
+    --paper:#F1ECE1;
+    --surface:#FCFAF4;
+    --seal:#C2410C;
+    --seal-soft:#F3DFCF;
+    --brass:#9A6D1F;
+    --pine:#3E5B4A;
+    --line:rgba(33,29,24,0.14);
+    --line-strong:rgba(33,29,24,0.28);
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --ink:#ECE6D9;
+      --ink-soft:#B8AF9D;
+      --paper:#1A1713;
+      --surface:#241F19;
+      --seal:#F0955F;
+      --seal-soft:#3A2620;
+      --brass:#D9A94B;
+      --pine:#8CAE97;
+      --line:rgba(236,230,217,0.16);
+      --line-strong:rgba(236,230,217,0.3);
+    }
+  }
+  :root[data-theme="dark"]{
+    --ink:#ECE6D9;
+    --ink-soft:#B8AF9D;
+    --paper:#1A1713;
+    --surface:#241F19;
+    --seal:#F0955F;
+    --seal-soft:#3A2620;
+    --brass:#D9A94B;
+    --pine:#8CAE97;
+    --line:rgba(236,230,217,0.16);
+    --line-strong:rgba(236,230,217,0.3);
+  }
+
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    background:var(--paper);
+    color:var(--ink);
+    font-family:'Noto Sans KR', -apple-system, sans-serif;
+    -webkit-font-smoothing:antialiased;
+  }
+  .page{
+    max-width:860px;
+    margin:0 auto;
+    padding:56px 28px 72px;
+  }
+
+  header{margin-bottom:36px;}
+  .eyebrow{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    font-family:'JetBrains Mono', monospace;
+    font-size:0.72rem;
+    letter-spacing:0.14em;
+    text-transform:uppercase;
+    color:var(--seal);
+    font-weight:700;
+    margin-bottom:14px;
+  }
+  .eyebrow::before{
+    content:"";
+    width:7px;height:7px;border-radius:50%;
+    background:var(--seal);
+    flex:none;
+  }
+  h1{
+    font-family:'Song Myung', serif;
+    font-size:clamp(2rem, 5vw, 2.6rem);
+    line-height:1.25;
+    margin:0 0 14px;
+    text-wrap:balance;
+  }
+  .lede{
+    font-size:1rem;
+    line-height:1.7;
+    color:var(--ink-soft);
+    max-width:64ch;
+  }
+  .lede strong{color:var(--ink);font-weight:700;}
+  .meta-row{
+    display:flex;
+    flex-wrap:wrap;
+    gap:8px 18px;
+    margin-top:20px;
+    padding-top:20px;
+    border-top:1px solid var(--line);
+    font-family:'JetBrains Mono', monospace;
+    font-size:0.78rem;
+    color:var(--ink-soft);
+  }
+  .meta-row span b{color:var(--ink);font-weight:700;}
+
+  .table-wrap{
+    overflow-x:auto;
+    border:1px solid var(--line);
+    border-radius:14px;
+    background:var(--surface);
+  }
+  table{
+    width:100%;
+    border-collapse:collapse;
+    font-size:0.92rem;
+    min-width:640px;
+  }
+  thead th{
+    text-align:left;
+    font-family:'JetBrains Mono', monospace;
+    font-size:0.72rem;
+    letter-spacing:0.06em;
+    text-transform:uppercase;
+    color:var(--ink-soft);
+    font-weight:700;
+    padding:16px 18px;
+    border-bottom:1px solid var(--line-strong);
+    white-space:nowrap;
+  }
+  tbody td{
+    padding:18px;
+    border-bottom:1px solid var(--line);
+    vertical-align:top;
+  }
+  tbody tr:last-child td{border-bottom:none;}
+  tbody tr.best{background:color-mix(in srgb, var(--seal) 8%, transparent);}
+
+  .rank-cell{
+    font-family:'JetBrains Mono', monospace;
+    font-weight:700;
+    font-size:1.1rem;
+    color:var(--ink-soft);
+    font-variant-numeric:tabular-nums;
+  }
+  .best .rank-cell{color:var(--seal);}
+
+  .name{font-weight:700;letter-spacing:-0.01em;line-height:1.4;}
+  .badge{
+    display:inline-block;
+    margin-top:6px;
+    font-family:'JetBrains Mono', monospace;
+    font-size:0.68rem;
+    letter-spacing:0.04em;
+    color:var(--seal);
+    background:var(--seal-soft);
+    padding:3px 8px;
+    border-radius:100px;
+  }
+
+  .price-now{
+    font-family:'JetBrains Mono', monospace;
+    font-weight:700;
+    font-size:1.05rem;
+    color:var(--ink);
+    font-variant-numeric:tabular-nums;
+  }
+  .price-orig{
+    display:block;
+    margin-top:4px;
+    font-size:0.78rem;
+    color:var(--ink-soft);
+    text-decoration:line-through;
+    font-variant-numeric:tabular-nums;
+  }
+  .discount{
+    display:inline-block;
+    margin-top:4px;
+    font-family:'JetBrains Mono', monospace;
+    font-size:0.75rem;
+    font-weight:700;
+    color:var(--seal);
+  }
+
+  .rating-line{display:flex;align-items:baseline;gap:5px;}
+  .star{color:var(--brass);font-size:0.9rem;}
+  .rating-num{
+    font-family:'JetBrains Mono', monospace;
+    font-weight:700;
+    font-variant-numeric:tabular-nums;
+  }
+
+  .review-num{
+    font-family:'JetBrains Mono', monospace;
+    font-weight:700;
+    font-variant-numeric:tabular-nums;
+  }
+  .review-label{
+    display:block;
+    margin-top:2px;
+    font-size:0.7rem;
+    color:var(--ink-soft);
+  }
+
+  .pick{
+    margin-top:32px;
+    padding:22px 24px;
+    border:1px solid var(--line-strong);
+    border-radius:14px;
+    background:var(--surface);
+    box-shadow:0 1px 0 var(--seal) inset;
+  }
+  .pick .pick-title{
+    font-family:'JetBrains Mono', monospace;
+    font-size:0.72rem;
+    letter-spacing:0.1em;
+    text-transform:uppercase;
+    color:var(--seal);
+    font-weight:700;
+    margin-bottom:8px;
+  }
+  .pick .pick-name{
+    font-size:1.15rem;
+    font-weight:700;
+    margin-bottom:8px;
+  }
+  .pick p{
+    margin:0;
+    font-size:0.92rem;
+    line-height:1.7;
+    color:var(--ink-soft);
+  }
+
+  footer{
+    margin-top:28px;
+    padding-top:18px;
+    border-top:1px solid var(--line);
+    font-size:0.8rem;
+    line-height:1.7;
+    color:var(--ink-soft);
+  }
+
+  @media (max-width:520px){
+    .page{padding:40px 18px 56px;}
+  }
+</style>
+
+<div class="page">
+  <header>
+    <div class="eyebrow">Coupang · 러닝화 검색결과</div>
+    <h1>쿠팡 "러닝화" 검색, 광고 뺀 진짜 상위 5개</h1>
+    <p class="lede">
+      쿠팡에서 <strong>"러닝화"</strong>를 검색한 뒤 "광고" 라벨이 붙은 스폰서 상품을 모두 제외하고,
+      쿠팡 랭킹순 기준 상위 5개만 골라 가격·별점·리뷰 수를 비교했다.
+    </p>
+    <div class="meta-row">
+      <span>검색어 <b>러닝화</b></span>
+      <span>정렬 <b>쿠팡 랭킹순</b></span>
+      <span>필터 <b>광고 상품 제외</b></span>
+      <span>기준일 <b>2026.09.06</b></span>
+    </div>
+  </header>
+
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>순위</th>
+          <th>상품명</th>
+          <th>가격</th>
+          <th>별점</th>
+          <th>리뷰 수</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td class="rank-cell">01</td>
+          <td class="name">스노우드림 런닝화 충격 흡수 운동화<br>프로 카본 플레이트 마라톤화</td>
+          <td>
+            <span class="price-now">34,800원</span>
+            <span class="price-orig">128,000원</span>
+            <span class="discount">72% ↓</span>
+          </td>
+          <td><span class="rating-line"><span class="star">★</span><span class="rating-num">4.5</span></span></td>
+          <td><span class="review-num">1,797</span><span class="review-label">건</span></td>
+        </tr>
+        <tr>
+          <td class="rank-cell">02</td>
+          <td class="name">까발로 발편한 충격 흡수 마라톤화<br>런닝화 운동화 CA011</td>
+          <td>
+            <span class="price-now">36,900원</span>
+            <span class="price-orig">44,900원</span>
+            <span class="discount">17% ↓</span>
+          </td>
+          <td><span class="rating-line"><span class="star">★</span><span class="rating-num">4.5</span></span></td>
+          <td><span class="review-num">2,129</span><span class="review-label">건</span></td>
+        </tr>
+        <tr>
+          <td class="rank-cell">03</td>
+          <td class="name">슈페르 발편한 런닝화 남성 운동화</td>
+          <td>
+            <span class="price-now">19,800원</span>
+            <span class="price-orig">57,450원</span>
+            <span class="discount">65% ↓</span>
+          </td>
+          <td><span class="rating-line"><span class="star">★</span><span class="rating-num">4.0</span></span></td>
+          <td><span class="review-num">8,509</span><span class="review-label">건</span></td>
+        </tr>
+        <tr class="best">
+          <td class="rank-cell">04</td>
+          <td class="name">SNRD 런닝화 SN192<div class="badge">가성비 1위</div></td>
+          <td>
+            <span class="price-now">19,900원</span>
+            <span class="price-orig">29,900원</span>
+            <span class="discount">33% ↓</span>
+          </td>
+          <td><span class="rating-line"><span class="star">★</span><span class="rating-num">4.5</span></span></td>
+          <td><span class="review-num">22,189</span><span class="review-label">건</span></td>
+        </tr>
+        <tr>
+          <td class="rank-cell">05</td>
+          <td class="name">미즈노 남녀공용 스피드 런닝화<br>D1GH223022</td>
+          <td>
+            <span class="price-now">52,060원</span>
+            <span class="price-orig">100,100원</span>
+            <span class="discount">47% ↓</span>
+          </td>
+          <td><span class="rating-line"><span class="star">★</span><span class="rating-num">5.0</span></span></td>
+          <td><span class="review-num">3,157</span><span class="review-label">건</span></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="pick">
+    <div class="pick-title">가성비 1위</div>
+    <div class="pick-name">SNRD 런닝화 SN192</div>
+    <p>2만원 이하의 가장 저렴한 축인데도 별점 4.5에 리뷰 22,189건으로 압도적으로 많아, 가격 대비 신뢰도와 검증된 만족도가 가장 높다.</p>
+  </div>
+
+  <footer>
+    광고(스폰서) 라벨이 붙은 상품은 전량 제외했으며, 가격·할인율·리뷰 수는 검색 시점(2026.09.06) 기준으로 변동될 수 있다.
+  </footer>
+</div>

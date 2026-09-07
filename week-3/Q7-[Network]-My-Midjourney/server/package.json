@@ -1,0 +1,16 @@
+{
+  "name": "my-midjourney-server",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "My-Midjourney BFF server - combines the fixed LEGO style with the user prompt and proxies image generation requests to Google's Nano Banana (Gemini 2.5 Flash Image) API using a key supplied per-request, never persisted to disk",
+  "scripts": {
+    "start": "node index.js",
+    "dev": "node index.js"
+  },
+  "dependencies": {
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.5",
+    "express": "^4.19.2"
+  }
+}

@@ -1,0 +1,359 @@
+<title>궐동 맛집 리뷰수 TOP 5</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Song+Myung&family=Noto+Sans+KR:wght@400;500;700;900&family=JetBrains+Mono:wght@500;700&display=swap');
+
+  :root{
+    --ink:#211D18;
+    --ink-soft:#5A5347;
+    --paper:#F1ECE1;
+    --surface:#FCFAF4;
+    --seal:#B33A2C;
+    --seal-soft:#E9DCD6;
+    --brass:#9A6D1F;
+    --pine:#3E5B4A;
+    --line:rgba(33,29,24,0.14);
+    --line-strong:rgba(33,29,24,0.28);
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --ink:#ECE6D9;
+      --ink-soft:#B8AF9D;
+      --paper:#1A1713;
+      --surface:#241F19;
+      --seal:#E2765C;
+      --seal-soft:#3A2620;
+      --brass:#D9A94B;
+      --pine:#8CAE97;
+      --line:rgba(236,230,217,0.16);
+      --line-strong:rgba(236,230,217,0.3);
+    }
+  }
+  :root[data-theme="dark"]{
+    --ink:#ECE6D9;
+    --ink-soft:#B8AF9D;
+    --paper:#1A1713;
+    --surface:#241F19;
+    --seal:#E2765C;
+    --seal-soft:#3A2620;
+    --brass:#D9A94B;
+    --pine:#8CAE97;
+    --line:rgba(236,230,217,0.16);
+    --line-strong:rgba(236,230,217,0.3);
+  }
+
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    background:var(--paper);
+    color:var(--ink);
+    font-family:'Noto Sans KR', -apple-system, sans-serif;
+    -webkit-font-smoothing:antialiased;
+  }
+  .page{
+    max-width:760px;
+    margin:0 auto;
+    padding:56px 28px 72px;
+  }
+
+  header{
+    margin-bottom:40px;
+  }
+  .eyebrow{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    font-family:'JetBrains Mono', monospace;
+    font-size:0.72rem;
+    letter-spacing:0.14em;
+    text-transform:uppercase;
+    color:var(--seal);
+    font-weight:700;
+    margin-bottom:14px;
+  }
+  .eyebrow::before{
+    content:"";
+    width:7px;height:7px;border-radius:50%;
+    background:var(--seal);
+    flex:none;
+  }
+  h1{
+    font-family:'Song Myung', serif;
+    font-size:clamp(2rem, 5vw, 2.6rem);
+    line-height:1.25;
+    margin:0 0 14px;
+    text-wrap:balance;
+  }
+  .lede{
+    font-size:1rem;
+    line-height:1.7;
+    color:var(--ink-soft);
+    max-width:60ch;
+  }
+  .lede strong{color:var(--ink);font-weight:700;}
+  .meta-row{
+    display:flex;
+    flex-wrap:wrap;
+    gap:8px 18px;
+    margin-top:20px;
+    padding-top:20px;
+    border-top:1px solid var(--line);
+    font-family:'JetBrains Mono', monospace;
+    font-size:0.78rem;
+    color:var(--ink-soft);
+  }
+  .meta-row span b{color:var(--ink);font-weight:700;}
+
+  .list{
+    display:flex;
+    flex-direction:column;
+    gap:14px;
+  }
+
+  .card{
+    position:relative;
+    display:grid;
+    grid-template-columns:64px 1fr auto;
+    gap:20px;
+    align-items:start;
+    padding:22px 22px 22px 18px;
+    background:var(--surface);
+    border:1px solid var(--line);
+    border-radius:14px;
+  }
+  .card.rank-1{
+    border-color:var(--line-strong);
+    box-shadow:0 1px 0 var(--seal) inset, 0 0 0 1px var(--seal-soft);
+  }
+
+  .rank{
+    font-family:'JetBrains Mono', monospace;
+    font-weight:700;
+    font-size:1.9rem;
+    font-variant-numeric:tabular-nums;
+    color:var(--ink-soft);
+    line-height:1;
+    padding-top:2px;
+  }
+  .rank-1 .rank{color:var(--seal);}
+
+  .info .name-row{
+    display:flex;
+    align-items:baseline;
+    flex-wrap:wrap;
+    gap:8px 10px;
+    margin-bottom:8px;
+  }
+  .name{
+    font-size:1.2rem;
+    font-weight:700;
+    letter-spacing:-0.01em;
+  }
+  .category{
+    font-family:'JetBrains Mono', monospace;
+    font-size:0.7rem;
+    letter-spacing:0.04em;
+    color:var(--pine);
+    background:color-mix(in srgb, var(--pine) 14%, transparent);
+    padding:3px 8px;
+    border-radius:100px;
+    white-space:nowrap;
+  }
+  .rating-line{
+    display:flex;
+    align-items:center;
+    gap:6px;
+    font-size:0.88rem;
+    color:var(--ink-soft);
+    margin-bottom:10px;
+  }
+  .star{color:var(--brass);font-size:0.95rem;}
+  .rating-num{
+    font-family:'JetBrains Mono', monospace;
+    font-weight:700;
+    color:var(--ink);
+    font-variant-numeric:tabular-nums;
+  }
+  .addr{
+    font-size:0.85rem;
+    line-height:1.55;
+    color:var(--ink-soft);
+    max-width:44ch;
+  }
+
+  .review{
+    text-align:right;
+    padding-left:12px;
+    border-left:1px solid var(--line);
+  }
+  .review-num{
+    display:block;
+    font-family:'JetBrains Mono', monospace;
+    font-weight:700;
+    font-size:1.7rem;
+    color:var(--seal);
+    font-variant-numeric:tabular-nums;
+    line-height:1;
+  }
+  .review-label{
+    display:block;
+    margin-top:6px;
+    font-size:0.68rem;
+    letter-spacing:0.08em;
+    text-transform:uppercase;
+    color:var(--ink-soft);
+    font-family:'JetBrains Mono', monospace;
+  }
+
+  footer{
+    margin-top:36px;
+    padding-top:20px;
+    border-top:1px solid var(--line);
+    font-size:0.82rem;
+    line-height:1.7;
+    color:var(--ink-soft);
+  }
+  footer .note-title{
+    font-weight:700;
+    color:var(--ink);
+    margin-bottom:4px;
+  }
+
+  @media (max-width:520px){
+    .card{grid-template-columns:40px 1fr;}
+    .review{
+      grid-column:1 / -1;
+      text-align:left;
+      border-left:none;
+      border-top:1px solid var(--line);
+      padding:12px 0 0;
+      display:flex;
+      align-items:baseline;
+      gap:8px;
+    }
+    .review-label{margin-top:0;}
+  }
+</style>
+
+<div class="page">
+  <header>
+    <div class="eyebrow">Kakao Map · 경기 오산시 궐동</div>
+    <h1>궐동 맛집, 리뷰 수로 다시 줄 세우면</h1>
+    <p class="lede">
+      "오산시 궐동 맛집" 검색 결과 상위 20곳 중, <strong>평점이 아닌 리뷰 건수</strong> 기준으로 다시 정렬한 TOP 5다.
+      리뷰 2~3건짜리 만점 가게가 1위를 차지하는 착시를 걷어내고, 실제로 많은 사람이 다녀간 곳을 가렸다.
+    </p>
+    <div class="meta-row">
+      <span>검색어 <b>오산시 궐동 맛집</b></span>
+      <span>표본 <b>상위 20곳</b></span>
+      <span>정렬 기준 <b>리뷰 수 desc</b></span>
+      <span>기준일 <b>2026.09.06</b></span>
+    </div>
+  </header>
+
+  <div class="list">
+    <article class="card rank-1">
+      <div class="rank">01</div>
+      <div class="info">
+        <div class="name-row">
+          <span class="name">송강커피</span>
+          <span class="category">커피전문점</span>
+        </div>
+        <div class="rating-line">
+          <span class="star">★</span>
+          <span class="rating-num">4.7</span>
+          <span>평점</span>
+        </div>
+        <div class="addr">경기 오산시 궐리사로 63 2층 (지번 궐동 631-2)</div>
+      </div>
+      <div class="review">
+        <span class="review-num">59</span>
+        <span class="review-label">리뷰 건</span>
+      </div>
+    </article>
+
+    <article class="card">
+      <div class="rank">02</div>
+      <div class="info">
+        <div class="name-row">
+          <span class="name">24시얼큰한뼈해장국</span>
+          <span class="category">해장국</span>
+        </div>
+        <div class="rating-line">
+          <span class="star">★</span>
+          <span class="rating-num">4.4</span>
+          <span>평점</span>
+        </div>
+        <div class="addr">경기 오산시 궐리사로46번길 60-14 1층 (지번 궐동 671-5)</div>
+      </div>
+      <div class="review">
+        <span class="review-num">51</span>
+        <span class="review-label">리뷰 건</span>
+      </div>
+    </article>
+
+    <article class="card">
+      <div class="rank">03</div>
+      <div class="info">
+        <div class="name-row">
+          <span class="name">카츠식당</span>
+          <span class="category">돈까스,우동</span>
+        </div>
+        <div class="rating-line">
+          <span class="star">★</span>
+          <span class="rating-num">4.8</span>
+          <span>평점</span>
+        </div>
+        <div class="addr">경기 오산시 궐동로7번길 3-5 2층 (지번 궐동 679-10)</div>
+      </div>
+      <div class="review">
+        <span class="review-num">31</span>
+        <span class="review-label">리뷰 건</span>
+      </div>
+    </article>
+
+    <article class="card">
+      <div class="rank">04</div>
+      <div class="info">
+        <div class="name-row">
+          <span class="name">보배반점 오산궐동점</span>
+          <span class="category">중국요리</span>
+        </div>
+        <div class="rating-line">
+          <span class="star">★</span>
+          <span class="rating-num">4.3</span>
+          <span>평점</span>
+        </div>
+        <div class="addr">경기 오산시 죽담안로 33-7 1층 (지번 궐동 784-2)</div>
+      </div>
+      <div class="review">
+        <span class="review-num">25</span>
+        <span class="review-label">리뷰 건</span>
+      </div>
+    </article>
+
+    <article class="card">
+      <div class="rank">05</div>
+      <div class="info">
+        <div class="name-row">
+          <span class="name">미식의최강자</span>
+          <span class="category">갈비</span>
+        </div>
+        <div class="rating-line">
+          <span class="star">★</span>
+          <span class="rating-num">4.5</span>
+          <span>평점</span>
+        </div>
+        <div class="addr">경기 오산시 궐리사로59번길 25 이진빌 1층 (지번 궐동 628-7)</div>
+      </div>
+      <div class="review">
+        <span class="review-num">22</span>
+        <span class="review-label">리뷰 건</span>
+      </div>
+    </article>
+  </div>
+
+  <footer>
+    <p class="note-title">동점 처리 안내</p>
+    <p>5위는 22건으로 우시장할매집과 동률이었다. 평점(4.5 vs 3.5)과 블로그 리뷰 수(305 vs 23)가 모두 앞서는 미식의최강자를 최종 5위로 선정했다.</p>
+  </footer>
+</div>

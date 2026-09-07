@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>실시간 코인 시세 대시보드</title>
+<link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="container">
+    <header class="header">
+      <h1>🪙 실시간 코인 시세 대시보드</h1>
+      <p class="subtitle">CoinGecko API 기반 · KRW 시세 / 24시간 등락률</p>
+    </header>
+
+    <div class="toolbar">
+      <button id="refreshBtn" class="btn btn-primary">🔄 새로고침</button>
+      <button id="autoToggleBtn" class="btn btn-toggle" data-active="false">⏱️ 자동 갱신: OFF</button>
+      <span id="lastUpdated" class="last-updated">마지막 업데이트: -</span>
+    </div>
+
+    <div id="toast" class="toast" hidden></div>
+
+    <main id="cardGrid" class="card-grid">
+      <!-- 카드들이 JS에 의해 동적으로 렌더링됨 -->
+    </main>
+
+    <footer class="footer">
+      <p>Data by <a href="https://www.coingecko.com/" target="_blank" rel="noopener">CoinGecko API</a></p>
+    </footer>
+  </div>
+
+  <!-- config.js는 script.js보다 먼저 로드해서 API Key를 주입한다 -->
+  <script src="config.js"></script>
+  <script src="script.js"></script>
+</body>
+</html>

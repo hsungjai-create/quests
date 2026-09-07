@@ -1,0 +1,10 @@
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: 'Segoe UI', 'Apple SD Gothic Neo', sans-serif;
+  background: #1c1c1c;
+  color: #222;
+}

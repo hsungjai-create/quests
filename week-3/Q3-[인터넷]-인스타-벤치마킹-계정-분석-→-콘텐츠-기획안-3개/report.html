@@ -1,0 +1,440 @@
+<title>초보 러너 벤치마킹 로그</title>
+<meta name="description" content="@jin92_workout 계정 12개 게시물을 분석해 초보 러너 콘텐츠의 반응 패턴 3가지와 빈틈을 찾고, 이를 응용한 콘텐츠 기획안 3개를 정리한 리포트">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@600;700;800;900&family=Noto+Sans+KR:wght@400;500;600;700;900&family=IBM+Plex+Mono:wght@500;600;700&display=swap">
+<style>
+  :root{
+    --paper:#f4efe1;
+    --panel:#eae1c8;
+    --panel-2:#e1d5b3;
+    --ink:#241f15;
+    --ink-dim:#6f634c;
+    --line:#cdbf99;
+    --accent:#d8481f;
+    --accent-deep:#9c3216;
+    --accent-soft:#f2d5c3;
+    --good:#3c7a54;
+    --good-bg:#dee8da;
+    --warn:#a9740f;
+    --warn-bg:#f0e2bd;
+    --mono-hi:#5c4a1e;
+    --font-display:"Big Shoulders Display","Noto Sans KR",sans-serif;
+    --font-body:"Noto Sans KR","Apple SD Gothic Neo",sans-serif;
+    --font-mono:"IBM Plex Mono","Noto Sans KR",monospace;
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --paper:#161209;
+      --panel:#201b12;
+      --panel-2:#2a2417;
+      --ink:#f1ead9;
+      --ink-dim:#a89a7c;
+      --line:#3c331f;
+      --accent:#ff7c49;
+      --accent-deep:#ffa072;
+      --accent-soft:#3a2313;
+      --good:#7fd39a;
+      --good-bg:#1e3226;
+      --warn:#e8c05f;
+      --warn-bg:#332911;
+      --mono-hi:#e8c877;
+    }
+  }
+  :root[data-theme="dark"]{
+    --paper:#161209;
+    --panel:#201b12;
+    --panel-2:#2a2417;
+    --ink:#f1ead9;
+    --ink-dim:#a89a7c;
+    --line:#3c331f;
+    --accent:#ff7c49;
+    --accent-deep:#ffa072;
+    --accent-soft:#3a2313;
+    --good:#7fd39a;
+    --good-bg:#1e3226;
+    --warn:#e8c05f;
+    --warn-bg:#332911;
+    --mono-hi:#e8c877;
+  }
+
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    background:
+      repeating-linear-gradient(to bottom, transparent, transparent 34px, color-mix(in srgb, var(--line) 55%, transparent) 35px),
+      var(--paper);
+    color:var(--ink);
+    font-family:var(--font-body);
+    line-height:1.65;
+  }
+  h1,h2,h3{text-wrap:balance; font-family:var(--font-display); font-weight:800; letter-spacing:.01em; margin:0;}
+  .num{font-family:var(--font-mono); font-variant-numeric:tabular-nums;}
+  a{color:var(--accent-deep);}
+  .wrap{max-width:900px; margin:0 auto; padding:28px 20px 90px;}
+
+  /* ---- bib header ---- */
+  .bib{
+    display:flex; align-items:center; gap:22px;
+    border:3px solid var(--ink);
+    background:var(--panel);
+    padding:22px 26px;
+    border-radius:4px;
+    box-shadow:5px 5px 0 var(--line);
+  }
+  .bib-no{
+    font-family:var(--font-display);
+    font-size:clamp(48px,9vw,72px);
+    font-weight:900;
+    color:var(--accent);
+    line-height:.85;
+    letter-spacing:-.02em;
+  }
+  .bib-text{flex:1; min-width:0;}
+  .bib-text .eyebrow{
+    font-family:var(--font-mono); font-size:12.5px; letter-spacing:.14em; text-transform:uppercase;
+    color:var(--ink-dim); margin:0 0 6px;
+  }
+  .bib-text h1{font-size:clamp(24px,4vw,34px);}
+  .bib-text .sub{color:var(--ink-dim); font-size:14.5px; margin-top:6px;}
+
+  /* ---- stat tiles ---- */
+  .stats{display:grid; grid-template-columns:repeat(4,1fr); gap:10px; margin-top:22px;}
+  .stat{
+    background:var(--panel); border:1.5px solid var(--line); border-radius:4px;
+    padding:14px 12px; text-align:center;
+  }
+  .stat .v{font-family:var(--font-display); font-size:clamp(26px,4vw,34px); font-weight:800; color:var(--accent-deep);}
+  .stat .l{font-size:11.5px; color:var(--ink-dim); letter-spacing:.03em; margin-top:2px;}
+  @media (max-width:600px){ .stats{grid-template-columns:repeat(2,1fr);} }
+
+  section{margin-top:46px;}
+  .step-head{display:flex; align-items:baseline; gap:12px; border-left:6px solid var(--accent); padding-left:14px; margin-bottom:16px;}
+  .step-head .n{font-family:var(--font-display); font-size:15px; color:var(--accent-deep); font-weight:800;}
+  .step-head h2{font-size:clamp(20px,3.4vw,26px);}
+  p{max-width:66ch;}
+  .lede{color:var(--ink-dim); font-size:15px;}
+
+  .note{
+    background:var(--warn-bg); border:1.5px dashed var(--warn); border-radius:4px;
+    padding:12px 16px; font-size:14px; color:var(--ink); margin:14px 0;
+  }
+  .note b{color:var(--warn);}
+
+  /* candidate cards */
+  .cand-grid{display:grid; grid-template-columns:repeat(2,1fr); gap:12px; margin-top:14px;}
+  @media (max-width:640px){ .cand-grid{grid-template-columns:1fr;} }
+  .cand{
+    border:1.5px solid var(--line); border-radius:4px; padding:14px 16px; background:var(--panel);
+  }
+  .cand.picked{border-color:var(--accent); background:color-mix(in srgb, var(--accent) 10%, var(--panel)); box-shadow:3px 3px 0 var(--accent-soft);}
+  .cand .h{display:flex; justify-content:space-between; align-items:baseline; gap:8px;}
+  .cand .id{font-family:var(--font-mono); font-weight:700; font-size:14.5px;}
+  .cand .tag{font-size:11px; font-family:var(--font-mono); padding:2px 7px; border-radius:99px; white-space:nowrap;}
+  .cand.picked .tag{background:var(--accent); color:var(--paper);}
+  .cand:not(.picked) .tag{background:var(--panel-2); color:var(--ink-dim);}
+  .cand .followers{font-family:var(--font-mono); color:var(--ink-dim); font-size:12.5px; margin-top:4px;}
+  .cand .why{font-size:13.5px; margin-top:8px; color:var(--ink);}
+
+  /* data table */
+  .tbl-wrap{overflow-x:auto; border:1.5px solid var(--line); border-radius:4px; margin-top:14px;}
+  table{border-collapse:collapse; width:100%; min-width:760px; font-size:13.5px;}
+  thead th{
+    background:var(--panel-2); text-align:left; font-family:var(--font-mono); font-size:11px;
+    letter-spacing:.06em; text-transform:uppercase; color:var(--ink-dim); padding:9px 10px; border-bottom:1.5px solid var(--line);
+    position:sticky; top:0;
+  }
+  tbody td{padding:9px 10px; border-bottom:1px solid var(--line); vertical-align:top;}
+  tbody tr:nth-child(even){background:color-mix(in srgb, var(--panel) 55%, transparent);}
+  td.num, th.num{font-family:var(--font-mono); font-variant-numeric:tabular-nums; white-space:nowrap;}
+  .badge{display:inline-block; font-family:var(--font-mono); font-size:10.5px; padding:2px 7px; border-radius:99px;}
+  .badge.ok{background:var(--good-bg); color:var(--good);}
+  .badge.na{background:var(--warn-bg); color:var(--warn);}
+  .foot-note{font-size:12.5px; color:var(--ink-dim); margin-top:10px;}
+
+  /* leaderboard bars */
+  .board{display:flex; flex-direction:column; gap:8px; margin-top:16px;}
+  .brow{display:grid; grid-template-columns:26px 1fr 52px; align-items:center; gap:10px;}
+  .brow .rk{font-family:var(--font-mono); color:var(--ink-dim); font-size:12.5px;}
+  .brow .track{background:var(--panel-2); border-radius:3px; height:22px; position:relative; overflow:hidden;}
+  .brow .bar{position:absolute; inset:0 auto 0 0; border-radius:3px 0 0 3px; display:flex; align-items:center;}
+  .brow .bar span{font-size:11.5px; color:var(--paper); padding-left:8px; font-weight:600; white-space:nowrap;}
+  .brow.top .bar{background:var(--accent);}
+  .brow.mid .bar{background:color-mix(in srgb, var(--accent) 55%, var(--ink-dim));}
+  .brow.low .bar{background:var(--ink-dim);}
+  .brow .score{font-family:var(--font-mono); text-align:right; font-size:13px; font-variant-numeric:tabular-nums;}
+  .brow .label{font-size:12px; color:var(--ink-dim); margin-top:2px;}
+
+  /* pattern cards */
+  .pattern{border:1.5px solid var(--line); border-radius:4px; padding:16px 18px; margin-top:12px; background:var(--panel);}
+  .pattern .ph{display:flex; gap:10px; align-items:baseline;}
+  .pattern .pn{font-family:var(--font-display); font-size:26px; font-weight:900; color:var(--accent);}
+  .pattern h3{font-size:16.5px;}
+  .pattern .ev{font-size:13.5px; margin-top:8px; padding:10px 12px; background:var(--panel-2); border-radius:3px; color:var(--ink-dim);}
+  .pattern .ev b{color:var(--ink); font-family:var(--font-mono);}
+
+  .gap-box{border:1.5px solid var(--accent); border-radius:4px; padding:16px 18px; margin-top:20px; background:var(--accent-soft);}
+  .gap-box h3{font-size:15px; color:var(--accent-deep);}
+  .gap-box ol{margin:10px 0 0; padding-left:20px;}
+  .gap-box li{margin-bottom:8px; font-size:14px;}
+
+  /* plan cards */
+  .plans{display:grid; grid-template-columns:repeat(3,1fr); gap:14px; margin-top:18px;}
+  @media (max-width:840px){ .plans{grid-template-columns:1fr;} }
+  .plan{border:1.5px solid var(--line); border-radius:5px; background:var(--panel); display:flex; flex-direction:column; overflow:hidden;}
+  .plan .tag-head{
+    background:var(--ink); color:var(--paper); padding:10px 14px; display:flex; justify-content:space-between; align-items:center;
+  }
+  .plan .tag-head .no{font-family:var(--font-display); font-weight:900; font-size:20px; color:var(--accent);}
+  .plan .tag-head .fmt{font-family:var(--font-mono); font-size:11px; letter-spacing:.05em; text-transform:uppercase; color:var(--paper);}
+  .plan-body{padding:14px 16px; display:flex; flex-direction:column; gap:10px; flex:1;}
+  .plan-body .hook{font-size:15px; font-weight:700; line-height:1.4;}
+  .plan-body .struct{font-size:13px; color:var(--ink-dim);}
+  .plan-body .struct ul{margin:6px 0 0; padding-left:18px;}
+  .plan-body .struct li{margin-bottom:4px;}
+  .plan-body .apply, .plan-body .fill{font-size:12.5px; padding:8px 10px; border-radius:3px;}
+  .plan-body .apply{background:var(--panel-2); color:var(--ink);}
+  .plan-body .fill{background:var(--good-bg); color:var(--good);}
+  .plan-body .apply b, .plan-body .fill b{font-family:var(--font-mono); font-size:11px; display:block; text-transform:uppercase; letter-spacing:.05em; margin-bottom:3px; color:inherit; opacity:.85;}
+
+  footer{margin-top:56px; padding-top:18px; border-top:1.5px dashed var(--line); font-size:12.5px; color:var(--ink-dim); display:flex; justify-content:space-between; gap:10px; flex-wrap:wrap;}
+</style>
+
+<div class="wrap">
+
+  <header class="bib">
+    <div class="bib-no num">08</div>
+    <div class="bib-text">
+      <p class="eyebrow">SNS 콘텐츠 기획 · 벤치마킹 리포트</p>
+      <h1>초보 러너 벤치마킹 로그</h1>
+      <p class="sub">벤치마킹 계정 @jin92_workout · 초보 러너 성장/훈련 기록 콘텐츠 기획</p>
+    </div>
+  </header>
+
+  <div class="stats">
+    <div class="stat"><div class="v num">12</div><div class="l">수집한 게시물</div></div>
+    <div class="stat"><div class="v num">8</div><div class="l">반응 수치 확정</div></div>
+    <div class="stat"><div class="v num">43</div><div class="l">최고 반응(좋아요+댓글)</div></div>
+    <div class="stat"><div class="v num">367</div><div class="l">벤치마킹 계정 팔로워</div></div>
+  </div>
+
+  <section id="step1">
+    <div class="step-head"><span class="n num">STEP 01</span><h2>계정 선정</h2></div>
+    <p class="lede">로그인 없이 접근 가능한 계정 중, 내 계정 단계(팔로워 100~1,000명)와 비슷하고 상업성이 없는 개인 러닝 기록 계정을 기준으로 비교했다.</p>
+    <div class="cand-grid">
+      <div class="cand picked">
+        <div class="h"><span class="id">@jin92_workout</span><span class="tag">선정</span></div>
+        <div class="followers num">팔로워 367 · 팔로잉 330</div>
+        <div class="why">"탈출 위해 운동이란 걸 시작한 초보" — 개인 운동/러닝 기록 계정. 상업성 없음, 로그인 없이 접근 가능, 팔로워 규모가 목표 범위에 정확히 부합.</div>
+      </div>
+      <div class="cand">
+        <div class="h"><span class="id">@goingchan_runner</span><span class="tag">제외</span></div>
+        <div class="followers num">팔로워 2,055</div>
+        <div class="why">규모 초과 + 자체 쇼핑몰 링크 보유로 반(半)상업적 계정에 가까움.</div>
+      </div>
+      <div class="cand">
+        <div class="h"><span class="id">@oli_jin</span><span class="tag">제외</span></div>
+        <div class="followers num">팔로워 39.4K</div>
+        <div class="why">인증 계정 · 브랜드 앰버서더형 계정으로 규모·성격 모두 목표와 거리가 멂.</div>
+      </div>
+      <div class="cand">
+        <div class="h"><span class="id">@hnu_sta</span><span class="tag">제외</span></div>
+        <div class="followers num">"러닝초보성장기"</div>
+        <div class="why">컨셉은 가장 부합했으나, 반복 시도에도 로그인 벽에 막혀 데이터 수집이 불가능했음.</div>
+      </div>
+    </div>
+  </section>
+
+  <section id="step2">
+    <div class="step-head"><span class="n num">STEP 02</span><h2>데이터 수집</h2></div>
+    <p class="lede">로그인 없이 프로필에 노출되는 게시물은 12개가 한계였고, 그중 4개는 여러 차례 재시도해도 상세 정보를 열람하지 못했다. 숫자나 캡션을 추정해 채우지 않고 "확인 불가"로 남겼다.</p>
+    <div class="note"><b>제약사항</b> — 계정 자체의 총 게시물 수와 무관하게, 로그인 없는 최초 접속 시 화면에는 최대 12개까지만 노출된다(구조적 한계). 그중 #9~12는 로그인 벽에 막혀 확인하지 못했다.</div>
+    <div class="tbl-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th class="num">#</th><th>게시 시기</th><th>포맷</th><th>주제</th>
+            <th class="num">좋아요</th><th class="num">댓글</th><th>캡션 톤</th><th>주요 해시태그</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="num">1</td><td class="num">2026-04-26</td><td>단일이미지</td>
+            <td>송도 신설 다리 '꿈이음길' 소개 + 3km 러닝</td>
+            <td class="num">13</td><td class="num">0</td><td>정보공유형</td>
+            <td>#송도신도시 #꿈이음길 #3km #러닝기록</td>
+          </tr>
+          <tr>
+            <td class="num">2</td><td class="num">2026-02-21</td><td>릴스</td>
+            <td>당뇨간식 협찬 후기 <span class="badge na">운동과 무관</span></td>
+            <td class="num">5</td><td class="num">1</td><td>협찬 후기</td>
+            <td>#당솔브챌린저스 #메디웰 #당솔브 #당뇨간식</td>
+          </tr>
+          <tr>
+            <td class="num">3</td><td class="num">2025-06-21</td><td>단일이미지</td>
+            <td>새벽 러닝 계획 → 실제 정오 러닝, 5km 완주, 러닝화 고민</td>
+            <td class="num">26</td><td class="num">1</td><td>솔직/자기개그</td>
+            <td>#5km #런린이 #러닝스타그램 #초보러너그램 #러닝기록 #혼런</td>
+          </tr>
+          <tr>
+            <td class="num">4</td><td class="num">2025-05-18</td><td>릴스</td>
+            <td>날씨 좋았던 날 5km, 짧은 소감</td>
+            <td class="num">17</td><td class="num">0</td><td>감성적</td>
+            <td>#런린이일기 #오늘의이슈 #러닝스타그램 #5km #오런완</td>
+          </tr>
+          <tr>
+            <td class="num">5</td><td class="num">2025-05-10</td><td>단일이미지</td>
+            <td>5km 러닝, 맥도날드 위치태그</td>
+            <td class="num"><span class="badge na">확인불가</span></td><td class="num"><span class="badge na">확인불가</span></td>
+            <td><span class="badge na">확인불가</span></td>
+            <td>#5km #running #맥도날드</td>
+          </tr>
+          <tr>
+            <td class="num">6</td><td class="num">2025-05-07</td><td>단일이미지</td>
+            <td>5km 러닝, 런데이 기록 오류, 달빛공원 야간러닝</td>
+            <td class="num">35</td><td class="num">0</td><td>솔직/투덜톤</td>
+            <td>#런린이 #5kmrunning #혼런 #달빛공원 #nightrun #nikerunclub</td>
+          </tr>
+          <tr>
+            <td class="num">7</td><td class="num">약 83주 전<sup>*</sup></td><td>단일이미지</td>
+            <td>한라산 등반 버킷리스트 완료 (관음사→성판악 코스)</td>
+            <td class="num">43</td><td class="num">0</td><td>성취/도전기록</td>
+            <td>#한라산 #등반 #제주도 #버킷리스트 #백록담 #관음사코스</td>
+          </tr>
+          <tr>
+            <td class="num">8</td><td class="num">약 83주 전<sup>*</sup></td><td>단일이미지</td>
+            <td>설악산 야간하산 경험담, "물 한병만 챙긴 것" 후회</td>
+            <td class="num">42</td><td class="num">0</td><td>경험담/반성톤</td>
+            <td>#설악산 #남설악탐방지원센터 #대청봉 #야간하산</td>
+          </tr>
+          <tr>
+            <td class="num">9</td><td class="num"><span class="badge na">확인불가</span></td><td>캐러셀(추정)</td>
+            <td><span class="badge na">확인불가</span></td>
+            <td class="num"><span class="badge na">확인불가</span></td><td class="num"><span class="badge na">확인불가</span></td>
+            <td><span class="badge na">확인불가</span></td><td><span class="badge na">확인불가</span></td>
+          </tr>
+          <tr>
+            <td class="num">10</td><td class="num"><span class="badge na">확인불가</span></td><td>릴스</td>
+            <td><span class="badge na">확인불가</span></td>
+            <td class="num"><span class="badge na">확인불가</span></td><td class="num"><span class="badge na">확인불가</span></td>
+            <td><span class="badge na">확인불가</span></td><td><span class="badge na">확인불가</span></td>
+          </tr>
+          <tr>
+            <td class="num">11</td><td class="num"><span class="badge na">확인불가</span></td><td>릴스</td>
+            <td><span class="badge na">확인불가</span></td>
+            <td class="num"><span class="badge na">확인불가</span></td><td class="num"><span class="badge na">확인불가</span></td>
+            <td><span class="badge na">확인불가</span></td><td><span class="badge na">확인불가</span></td>
+          </tr>
+          <tr>
+            <td class="num">12</td><td class="num"><span class="badge na">확인불가</span></td><td>릴스</td>
+            <td><span class="badge na">확인불가</span></td>
+            <td class="num"><span class="badge na">확인불가</span></td><td class="num"><span class="badge na">확인불가</span></td>
+            <td><span class="badge na">확인불가</span></td><td><span class="badge na">확인불가</span></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="foot-note"><sup>*</sup> #7·#8은 도구가 "83주 전"이라는 상대 시점과 서로 다른 절대 날짜를 함께 제시해 신뢰할 수 없었다. 절대 날짜는 표기하지 않고 상대 시점만 남겼다. 좋아요·댓글·캡션·해시태그는 구체적으로 확인된 값 그대로다.</p>
+  </section>
+
+  <section id="step3">
+    <div class="step-head"><span class="n num">STEP 03</span><h2>패턴 분석</h2></div>
+    <p class="lede">반응 수치가 확정된 8개 게시물을 좋아요+댓글 합산으로 줄 세워 비교했다.</p>
+
+    <div class="board">
+      <div class="brow top"><span class="rk num">1</span><div class="track"><div class="bar" style="width:100%"><span>#7 한라산 등반</span></div></div><span class="score num">43</span></div>
+      <div class="brow top"><span class="rk num">2</span><div class="track"><div class="bar" style="width:97.7%"><span>#8 설악산 야간하산</span></div></div><span class="score num">42</span></div>
+      <div class="brow top"><span class="rk num">3</span><div class="track"><div class="bar" style="width:81.4%"><span>#6 야간러닝·기록오류</span></div></div><span class="score num">35</span></div>
+      <div class="brow mid"><span class="rk num">4</span><div class="track"><div class="bar" style="width:62.8%"><span>#3 새벽러닝 계획·러닝화 고민</span></div></div><span class="score num">27</span></div>
+      <div class="brow mid"><span class="rk num">5</span><div class="track"><div class="bar" style="width:39.5%"><span>#4 날씨 좋았던 날 5km</span></div></div><span class="score num">17</span></div>
+      <div class="brow mid"><span class="rk num">6</span><div class="track"><div class="bar" style="width:30.2%"><span>#1 송도 새 다리 소개</span></div></div><span class="score num">13</span></div>
+      <div class="brow low"><span class="rk num">7</span><div class="track"><div class="bar" style="width:14%"><span>#2 당뇨간식 협찬</span></div></div><span class="score num">6</span></div>
+    </div>
+    <p class="foot-note">막대 길이 = 좋아요+댓글 합산 (최댓값 43 기준 상대 비율)</p>
+
+    <div class="pattern">
+      <div class="ph"><span class="pn num">1</span><h3>일상 루틴보다 "특별한 도전·이벤트"가 반응이 크다</h3></div>
+      <p class="ev">한라산 등반<b>(#7, 43)</b>과 설악산 야간하산<b>(#8, 42)</b>이 1·2위. 평범한 "오늘도 5km" 류<b>(#1, 13 / #4, 17)</b>는 절반 이하 수준 — 도전 서사가 있는 게시물이 2~3배 높은 반응을 얻는다.</p>
+    </div>
+    <div class="pattern">
+      <div class="ph"><span class="pn num">2</span><h3>실수·계획 실패를 솔직히 인정하는 캡션이 반응을 이끈다</h3></div>
+      <p class="ev"><b>#6</b> "런데이 기록이 이상하다"(오류 고백, 35) · <b>#8</b> "물 한병만 챙겨간 것 후회"(반성, 42) · <b>#3</b> "계획은 계획일 뿐··· 중간에 엄청 쉬었어요"(자기개그, 27 — 이 계정에서 드물게 댓글도 달림). 정보 전달형<b>(#1, 13)</b>보다 확연히 높다.</p>
+    </div>
+    <div class="pattern">
+      <div class="ph"><span class="pn num">3</span><h3>협찬·광고성 콘텐츠는 반응이 가장 낮다</h3></div>
+      <p class="ev"><b>#2</b> 당뇨간식 협찬 후기가 8개 중 최하위<b>(좋아요5·댓글1)</b>. 순수 개인 기록 게시물<b>(#3·#6·#7·#8)</b>은 모두 두 자릿수 이상 — 팔로워는 이 계정을 "협찬 리뷰어"가 아닌 "동네 초보 러너"로 보고 있다.</p>
+    </div>
+
+    <div class="gap-box">
+      <h3>이 계정이 안 하고 있는 것 — 빈틈</h3>
+      <ol>
+        <li><b>댓글 유도 부재</b> — 8개 중 6개가 댓글 0. <b class="num">#3</b>에서 "러닝화 추천해달라" 질문을 던졌지만 댓글 1개뿐, 참여로 이어지지 않는다.</li>
+        <li><b>노하우·정보성 콘텐츠 부재</b> — 전부 "오늘 뛴 기록" 나열이거나 협찬. 러닝화 고르는 법, 페이스 조절, 부상 예방 같은 실질적 팁이 하나도 없다.</li>
+        <li><b>성장 서사(누적 데이터) 부재</b> — 매번 "5km 뛰었다"는 단발성 기록만 있고, 시작 대비 얼마나 늘었는지 보여주는 비교 콘텐츠가 없다.</li>
+      </ol>
+    </div>
+  </section>
+
+  <section id="step4">
+    <div class="step-head"><span class="n num">STEP 04</span><h2>콘텐츠 기획안 3개</h2></div>
+    <p class="lede">3단계의 공식을 그대로 베끼지 않고 변형했고, 빈틈 3가지를 각각 하나씩 메우도록 설계했다.</p>
+    <div class="plans">
+
+      <div class="plan">
+        <div class="tag-head"><span class="no num">01</span><span class="fmt">릴스</span></div>
+        <div class="plan-body">
+          <div class="hook">"5km 완주, 사실 3번 실패하고 성공했어요"</div>
+          <div class="struct">
+            <ul>
+              <li>도입 — 1·2번째 시도에서 걷거나 포기한 장면 (3초 컷)</li>
+              <li>본론 — 3번째 도전, 힘들었던 구간의 표정·호흡</li>
+              <li>마무리 — 완주 순간 + "여러분의 첫 완주 실패담은?" 질문</li>
+            </ul>
+          </div>
+          <div class="apply"><b>패턴 응용</b>반응 1위 도전 서사(#7)와 2위 실패 고백(#8)을 결합해, 실패 자체를 메인 소재로 전면 배치</div>
+          <div class="fill"><b>빈틈 보완</b>엔딩에 명확한 질문을 배치해 댓글 유도 구조를 만듦</div>
+        </div>
+      </div>
+
+      <div class="plan">
+        <div class="tag-head"><span class="no num">02</span><span class="fmt">캐러셀 · 8슬라이드</span></div>
+        <div class="plan-body">
+          <div class="hook">"러닝화 3켤레 사고 알게 된 것 (내돈내산)"</div>
+          <div class="struct">
+            <ul>
+              <li>S1 훅 — "러닝화 3켤레 사고 나서 알게 된 것들"</li>
+              <li>S2~6 — 러닝화·양말·이어폰 실패담과 이유</li>
+              <li>S7 — 지금 쓰는 최종 조합 정리</li>
+              <li>S8 — "당신의 장비 실패담은?" 댓글 유도</li>
+            </ul>
+          </div>
+          <div class="apply"><b>패턴 응용</b>#3의 "러닝화 추천해달라" 질문을 스스로 답하는 정보성 콘텐츠로 완성</div>
+          <div class="fill"><b>빈틈 보완</b>노하우 콘텐츠 부재를 메우고, 협찬(#2) 최하위 반응을 반영해 "내돈내산"임을 명시해 신뢰도 확보</div>
+        </div>
+      </div>
+
+      <div class="plan">
+        <div class="tag-head"><span class="no num">03</span><span class="fmt">캐러셀 · 4슬라이드</span></div>
+        <div class="plan-body">
+          <div class="hook">"8주 전엔 1km도 헉헉댔는데"</div>
+          <div class="struct">
+            <ul>
+              <li>S1 — 1주차 러닝 기록 스크린샷 (느린 페이스)</li>
+              <li>S2 — 8주차 기록 스크린샷 (비교)</li>
+              <li>S3 — 그만두고 싶었던 고비를 솔직히 고백</li>
+              <li>S4 — 다음 목표(10km) 선언 + "응원 댓글 남겨주세요"</li>
+            </ul>
+          </div>
+          <div class="apply"><b>패턴 응용</b>도전 서사(#7)와 솔직한 고비 고백(#8) 패턴을 결합</div>
+          <div class="fill"><b>빈틈 보완</b>단발성 기록만 있던 계정과 달리, Before–After 성장 비교로 누적 서사의 빈틈을 정면으로 메움</div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <footer>
+    <span>SNS 콘텐츠 기획 어시스턴트 · 벤치마킹 계정 @jin92_workout</span>
+    <span>작성일 2026-09-06</span>
+  </footer>
+
+</div>

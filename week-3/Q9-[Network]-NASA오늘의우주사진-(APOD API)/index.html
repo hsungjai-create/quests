@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>오늘의 우주 사진 · NASA APOD 매거진</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,500;0,700;0,900;1,600&family=Noto+Serif+KR:wght@400;500;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="stars" aria-hidden="true"></div>
+
+  <header class="masthead">
+    <div class="masthead-inner">
+      <div class="masthead-title">
+        <span class="kicker">NASA Astronomy Picture of the Day</span>
+        <h1>🌌 오늘의 우주 사진</h1>
+      </div>
+      <div class="masthead-actions">
+        <label class="date-field">
+          <span>날짜</span>
+          <input type="date" id="dateInput" />
+        </label>
+        <button id="todayBtn" class="btn btn-ghost">오늘</button>
+        <button id="settingsBtn" class="btn btn-icon" title="API 키 설정" aria-haspopup="dialog">⚙️</button>
+      </div>
+    </div>
+    <div id="keyBadge" class="key-badge" hidden></div>
+  </header>
+
+  <div id="toast" class="toast" hidden></div>
+
+  <main class="magazine">
+    <article id="article" class="issue">
+      <!-- JS가 이 안에 표지/기사 콘텐츠를 렌더링함 -->
+    </article>
+  </main>
+
+  <footer class="footer">
+    <p>
+      Data &amp; imagery courtesy of
+      <a href="https://apod.nasa.gov/apod/astropix.html" target="_blank" rel="noopener">NASA APOD</a>
+      · via <a href="https://api.nasa.gov/" target="_blank" rel="noopener">api.nasa.gov</a>
+    </p>
+  </footer>
+
+  <!-- API 키 설정 모달: 키는 파일이 아니라 브라우저 localStorage에만 저장됨 -->
+  <div id="settingsModal" class="modal-backdrop" hidden>
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+      <h2 id="modalTitle">🔑 NASA API 키 설정</h2>
+      <p class="modal-desc">
+        API 키는 이 브라우저의 <code>localStorage</code>에만 저장되며, 코드/저장소에는 절대 포함되지 않습니다.
+        키를 입력하지 않으면 공용 <code>DEMO_KEY</code>로 동작하지만 요청 횟수 제한이 있어 자주 끊길 수 있습니다.
+      </p>
+      <input
+        type="text"
+        id="apiKeyInput"
+        placeholder="본인의 NASA API 키를 입력하세요"
+        autocomplete="off"
+        spellcheck="false"
+      />
+      <p class="modal-hint">
+        키가 없다면 <a href="https://api.nasa.gov/" target="_blank" rel="noopener">api.nasa.gov</a>에서
+        이메일만으로 무료로 즉시 발급받을 수 있습니다.
+      </p>
+      <div class="modal-actions">
+        <button id="clearKeyBtn" class="btn btn-ghost">키 삭제</button>
+        <div class="modal-actions-right">
+          <button id="cancelKeyBtn" class="btn btn-ghost">취소</button>
+          <button id="saveKeyBtn" class="btn btn-primary">저장</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>

@@ -1,0 +1,492 @@
+:root {
+  --paper: #f7f3ea;
+  --paper-shadow: rgba(0, 0, 0, 0.35);
+  --ink: #1c1a17;
+  --ink-soft: #4a463f;
+  --rule: #d8d0bd;
+  --space-deep: #05060f;
+  --space-mid: #0c1024;
+  --accent: #c9a24b;
+  --accent-soft: #e7d9ad;
+  --error: #ff6b6b;
+  --font-display: "Playfair Display", "Noto Serif KR", serif;
+  --font-body: "Noto Serif KR", "Playfair Display", serif;
+  --font-ui: "Inter", sans-serif;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  min-height: 100%;
+}
+
+body {
+  font-family: var(--font-ui);
+  background: radial-gradient(ellipse at top, var(--space-mid), var(--space-deep) 70%);
+  color: var(--ink);
+  min-height: 100vh;
+  position: relative;
+  overflow-x: hidden;
+}
+
+/* ===== 배경 별 텍스처 ===== */
+.stars {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  background-image:
+    radial-gradient(1.5px 1.5px at 20% 30%, #ffffff 100%, transparent 0),
+    radial-gradient(1px 1px at 70% 65%, #ffffff 100%, transparent 0),
+    radial-gradient(2px 2px at 85% 20%, #ffffff 100%, transparent 0),
+    radial-gradient(1px 1px at 40% 80%, #ffffff 100%, transparent 0),
+    radial-gradient(1.5px 1.5px at 55% 45%, #ffffff 100%, transparent 0),
+    radial-gradient(1px 1px at 10% 60%, #ffffff 100%, transparent 0),
+    radial-gradient(1px 1px at 92% 85%, #ffffff 100%, transparent 0);
+  background-repeat: repeat;
+  background-size: 600px 600px;
+  opacity: 0.5;
+}
+
+/* ===== 상단 마스트헤드 ===== */
+.masthead {
+  padding: 28px 24px 18px;
+  max-width: 980px;
+  margin: 0 auto;
+}
+
+.masthead-inner {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 16px;
+  border-bottom: 2px solid var(--accent);
+  padding-bottom: 16px;
+}
+
+.masthead-title .kicker {
+  display: block;
+  font-family: var(--font-ui);
+  font-size: 11px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--accent-soft);
+  margin-bottom: 6px;
+}
+
+.masthead-title h1 {
+  font-family: var(--font-display);
+  font-weight: 900;
+  font-size: clamp(28px, 5vw, 44px);
+  margin: 0;
+  color: #f5efe0;
+  letter-spacing: -0.01em;
+}
+
+.masthead-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.date-field {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  font-family: var(--font-ui);
+  font-size: 11px;
+  color: var(--accent-soft);
+  letter-spacing: 0.04em;
+}
+
+.date-field input[type="date"] {
+  font-family: var(--font-ui);
+  font-size: 14px;
+  padding: 7px 10px;
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  background: rgba(255, 255, 255, 0.08);
+  color: #f5efe0;
+  color-scheme: dark;
+}
+
+.btn {
+  font-family: var(--font-ui);
+  font-size: 14px;
+  font-weight: 600;
+  padding: 9px 16px;
+  border-radius: 8px;
+  border: 1px solid transparent;
+  cursor: pointer;
+  transition: transform 0.15s ease, opacity 0.15s ease, background 0.15s ease;
+}
+
+.btn:active {
+  transform: scale(0.97);
+}
+
+.btn-ghost {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(255, 255, 255, 0.25);
+  color: #f5efe0;
+}
+
+.btn-ghost:hover {
+  background: rgba(255, 255, 255, 0.16);
+}
+
+.btn-icon {
+  padding: 9px 12px;
+  font-size: 16px;
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(255, 255, 255, 0.25);
+}
+
+.btn-icon:hover {
+  background: rgba(255, 255, 255, 0.16);
+}
+
+.btn-primary {
+  background: var(--accent);
+  color: #211a08;
+}
+
+.btn-primary:hover {
+  background: #d9b563;
+}
+
+.key-badge {
+  max-width: 980px;
+  margin: 10px auto 0;
+  font-family: var(--font-ui);
+  font-size: 12.5px;
+  color: #ffe9b3;
+  background: rgba(201, 162, 75, 0.16);
+  border: 1px solid rgba(201, 162, 75, 0.4);
+  padding: 8px 14px;
+  border-radius: 8px;
+}
+
+/* ===== 토스트 ===== */
+.toast {
+  max-width: 980px;
+  margin: 0 auto;
+  padding: 10px 16px;
+  border-radius: 8px;
+  background: rgba(255, 107, 107, 0.15);
+  border: 1px solid rgba(255, 107, 107, 0.4);
+  color: #ffd2d2;
+  font-family: var(--font-ui);
+  font-size: 13.5px;
+}
+
+/* ===== 매거진 본문 ===== */
+.magazine {
+  max-width: 980px;
+  margin: 24px auto 60px;
+  padding: 0 24px;
+}
+
+.issue {
+  background: var(--paper);
+  border-radius: 4px;
+  box-shadow: 0 30px 70px var(--paper-shadow), 0 2px 0 rgba(255, 255, 255, 0.4) inset;
+  overflow: hidden;
+}
+
+.fallback-note {
+  margin: 0;
+  padding: 10px 40px;
+  font-family: var(--font-ui);
+  font-size: 12.5px;
+  color: #6b4e12;
+  background: var(--accent-soft);
+  border-bottom: 1px solid var(--rule);
+}
+
+.hero-media {
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  background: #0000001a;
+  position: relative;
+}
+
+.hero-media img,
+.hero-media iframe {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  border: none;
+}
+
+.hero-caption {
+  font-family: var(--font-ui);
+  font-size: 12px;
+  color: var(--ink-soft);
+  padding: 8px 40px 0;
+  text-align: right;
+  font-style: italic;
+}
+
+.issue-body {
+  padding: 30px 40px 48px;
+}
+
+.issue-meta {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  font-family: var(--font-ui);
+  font-size: 12.5px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--ink-soft);
+  margin-bottom: 14px;
+}
+
+.issue-meta .dot {
+  opacity: 0.5;
+}
+
+.issue-title {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: clamp(26px, 4vw, 40px);
+  line-height: 1.15;
+  margin: 0 0 20px;
+  color: var(--ink);
+}
+
+.issue-explanation {
+  font-family: var(--font-body);
+  font-size: 17px;
+  line-height: 1.85;
+  color: #2c2820;
+  column-gap: 40px;
+  border-top: 1px solid var(--rule);
+  padding-top: 22px;
+}
+
+.issue-explanation p {
+  margin: 0 0 1.1em;
+}
+
+.issue-explanation::first-letter {
+  font-family: var(--font-display);
+  font-size: 3.6em;
+  font-weight: 900;
+  float: left;
+  line-height: 0.8;
+  padding: 0.05em 0.08em 0 0;
+  color: var(--accent);
+}
+
+.explanation-note {
+  margin-top: 22px;
+  font-family: var(--font-ui);
+  font-size: 12px;
+  color: var(--ink-soft);
+  border-top: 1px dashed var(--rule);
+  padding-top: 12px;
+}
+
+.issue-links {
+  margin-top: 24px;
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.issue-links a {
+  font-family: var(--font-ui);
+  font-size: 13.5px;
+  font-weight: 600;
+  color: #21201d;
+  background: var(--accent-soft);
+  border: 1px solid var(--accent);
+  padding: 8px 14px;
+  border-radius: 999px;
+  text-decoration: none;
+  transition: background 0.15s ease;
+}
+
+.issue-links a:hover {
+  background: var(--accent);
+}
+
+/* ===== 로딩 스켈레톤 ===== */
+.skeleton {
+  background: linear-gradient(90deg, #e8e2d2 25%, #f2ede0 37%, #e8e2d2 63%);
+  background-size: 400% 100%;
+  animation: shimmer 1.4s ease infinite;
+  border-radius: 6px;
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: 100% 0;
+  }
+  100% {
+    background-position: -100% 0;
+  }
+}
+
+.skel-hero {
+  width: 100%;
+  aspect-ratio: 16 / 9;
+}
+
+.skel-line {
+  height: 14px;
+  margin: 10px 40px;
+}
+
+.skel-title {
+  height: 34px;
+  margin: 24px 40px 10px;
+  width: 70%;
+}
+
+/* ===== 에러 카드 ===== */
+.error-card {
+  padding: 60px 40px;
+  text-align: center;
+  font-family: var(--font-ui);
+}
+
+.error-card .emoji {
+  font-size: 42px;
+  display: block;
+  margin-bottom: 12px;
+}
+
+.error-card h3 {
+  font-family: var(--font-display);
+  margin: 0 0 8px;
+}
+
+.error-card p {
+  color: var(--ink-soft);
+  margin: 0;
+}
+
+/* ===== 설정 모달 ===== */
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(5, 6, 15, 0.72);
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 100;
+  padding: 20px;
+}
+
+/* class 선택자가 display:flex를 지정하면 hidden 속성의 기본 display:none을 덮어써 버려서
+   모달이 항상 화면 전체를 덮어 클릭을 가로채는 문제가 있었음 (설정/저장 버튼이 안 눌리던 원인) */
+.modal-backdrop[hidden] {
+  display: none;
+}
+
+.modal {
+  background: var(--paper);
+  border-radius: 12px;
+  max-width: 440px;
+  width: 100%;
+  padding: 26px 28px 22px;
+  font-family: var(--font-ui);
+  box-shadow: 0 30px 80px rgba(0, 0, 0, 0.5);
+}
+
+.modal h2 {
+  font-family: var(--font-display);
+  margin: 0 0 12px;
+  font-size: 22px;
+}
+
+.modal-desc {
+  font-size: 13.5px;
+  line-height: 1.6;
+  color: var(--ink-soft);
+  margin: 0 0 16px;
+}
+
+.modal-desc code {
+  background: rgba(0, 0, 0, 0.08);
+  padding: 1px 5px;
+  border-radius: 4px;
+}
+
+#apiKeyInput {
+  width: 100%;
+  font-size: 14px;
+  padding: 10px 12px;
+  border-radius: 8px;
+  border: 1px solid var(--rule);
+  background: #fffdf8;
+  font-family: var(--font-ui);
+}
+
+.modal-hint {
+  font-size: 12.5px;
+  color: var(--ink-soft);
+  margin: 10px 0 0;
+}
+
+.modal-hint a {
+  color: #7a5b13;
+}
+
+.modal-actions {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 20px;
+}
+
+.modal-actions-right {
+  display: flex;
+  gap: 8px;
+}
+
+.modal-actions .btn-ghost {
+  background: rgba(0, 0, 0, 0.06);
+  border-color: var(--rule);
+  color: var(--ink);
+}
+
+.modal-actions .btn-ghost:hover {
+  background: rgba(0, 0, 0, 0.1);
+}
+
+/* ===== 푸터 ===== */
+.footer {
+  max-width: 980px;
+  margin: 0 auto 40px;
+  padding: 0 24px;
+  text-align: center;
+  font-family: var(--font-ui);
+  font-size: 12.5px;
+  color: rgba(245, 239, 224, 0.55);
+}
+
+.footer a {
+  color: var(--accent-soft);
+}
+
+@media (max-width: 640px) {
+  .issue-body {
+    padding: 24px 22px 36px;
+  }
+  .hero-caption {
+    padding: 8px 22px 0;
+  }
+}

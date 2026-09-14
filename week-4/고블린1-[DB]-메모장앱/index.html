@@ -1,0 +1,420 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>메모장</title>
+  <script src="https://cdn.tailwindcss.com/3.4.16"></script>
+  <script src="https://unpkg.com/react@18.3.1/umd/react.development.js" crossorigin></script>
+  <script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" crossorigin></script>
+  <script src="https://unpkg.com/@babel/standalone@7.25.9/babel.min.js"></script>
+</head>
+<body class="bg-slate-100 min-h-screen">
+  <div id="root"></div>
+  <script type="text/babel">
+    const { useState, useEffect, useCallback, useRef } = React;
+
+    // ========================================
+    // 📡 API
+    // ========================================
+    const API_BASE_URL = '/api';
+
+    async function apiRequest(path, options) {
+      const res = await fetch(`${API_BASE_URL}${path}`, {
+        headers: { 'Content-Type': 'application/json' },
+        ...options,
+      });
+      const json = await res.json();
+      if (!res.ok || !json.success) {
+        throw new Error(json.message || '요청에 실패했습니다.');
+      }
+      return json.data;
+    }
+
+    // ========================================
+    // 🛠️ Utils
+    // ========================================
+    function formatDate(iso) {
+      const d = new Date(iso);
+      return d.toLocaleString('ko-KR', {
+        year: 'numeric', month: '2-digit', day: '2-digit',
+        hour: '2-digit', minute: '2-digit',
+      });
+    }
+
+    // ========================================
+    // 🎨 Design System Components
+    // ========================================
+    function Button({ variant = 'primary', size = 'md', disabled, onClick, className = '', children, type = 'button' }) {
+      const base = 'inline-flex items-center justify-center font-medium rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed';
+      const variants = {
+        primary: 'bg-indigo-600 text-white hover:bg-indigo-700',
+        secondary: 'bg-slate-100 text-slate-700 hover:bg-slate-200',
+        danger: 'bg-white text-red-500 hover:bg-red-50 border border-transparent',
+        ghost: 'bg-transparent text-slate-500 hover:bg-slate-100',
+      };
+      const sizes = {
+        sm: 'text-sm px-3 py-1.5',
+        md: 'text-sm px-4 py-2',
+      };
+      return (
+        <button
+          type={type}
+          disabled={disabled}
+          onClick={onClick}
+          className={`${base} ${variants[variant]} ${sizes[size]} ${className}`}
+        >
+          {children}
+        </button>
+      );
+    }
+
+    function Input({ value, onChange, placeholder, disabled, className = '' }) {
+      return (
+        <input
+          type="text"
+          value={value}
+          onChange={onChange}
+          placeholder={placeholder}
+          disabled={disabled}
+          className={`w-full rounded-lg border border-slate-300 px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-400 disabled:bg-slate-50 ${className}`}
+        />
+      );
+    }
+
+    function Textarea({ value, onChange, placeholder, disabled, rows = 3, className = '' }) {
+      return (
+        <textarea
+          value={value}
+          onChange={onChange}
+          placeholder={placeholder}
+          disabled={disabled}
+          rows={rows}
+          className={`w-full rounded-lg border border-slate-300 px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-400 disabled:bg-slate-50 resize-none ${className}`}
+        />
+      );
+    }
+
+    function Card({ className = '', children }) {
+      return (
+        <div className={`bg-white rounded-2xl shadow-sm border border-slate-200 ${className}`}>
+          {children}
+        </div>
+      );
+    }
+
+    function Modal({ isOpen, onClose, title, children }) {
+      if (!isOpen) return null;
+      return (
+        <div
+          className="fixed inset-0 bg-slate-900/40 flex items-center justify-center p-4 z-50"
+          onClick={onClose}
+        >
+          <div
+            className="bg-white rounded-2xl shadow-lg w-full max-w-md p-5"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-lg font-semibold text-slate-800">{title}</h2>
+              <button
+                onClick={onClose}
+                aria-label="닫기"
+                className="text-slate-400 hover:text-slate-600 text-lg leading-none px-1"
+              >
+                ✕
+              </button>
+            </div>
+            {children}
+          </div>
+        </div>
+      );
+    }
+
+    // ========================================
+    // 🔍 SearchBar
+    // ========================================
+    function SearchBar({ value, onChange }) {
+      return (
+        <div className="relative mb-4">
+          <Input
+            value={value}
+            onChange={(e) => onChange(e.target.value)}
+            placeholder="제목/내용 검색"
+            className="pr-9"
+          />
+          {value && (
+            <button
+              onClick={() => onChange('')}
+              aria-label="검색어 지우기"
+              className="absolute right-2 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 text-sm px-1"
+            >
+              ✕
+            </button>
+          )}
+        </div>
+      );
+    }
+
+    // ========================================
+    // 🧩 MemoForm (작성 폼)
+    // ========================================
+    function MemoForm({ onCreate, submitting }) {
+      const [title, setTitle] = useState('');
+      const [content, setContent] = useState('');
+
+      const handleSubmit = async (e) => {
+        e.preventDefault();
+        if (!title.trim() || submitting) return;
+        await onCreate({ title: title.trim(), content: content.trim() });
+        setTitle('');
+        setContent('');
+      };
+
+      return (
+        <Card className="p-4 mb-4">
+          <form onSubmit={handleSubmit} className="space-y-3">
+            <Input
+              value={title}
+              onChange={(e) => setTitle(e.target.value)}
+              placeholder="제목을 입력하세요"
+              disabled={submitting}
+            />
+            <Textarea
+              value={content}
+              onChange={(e) => setContent(e.target.value)}
+              placeholder="내용을 입력하세요 (선택)"
+              disabled={submitting}
+            />
+            <div className="flex justify-end">
+              <Button type="submit" disabled={submitting || !title.trim()}>
+                메모 추가
+              </Button>
+            </div>
+          </form>
+        </Card>
+      );
+    }
+
+    // ========================================
+    // 🧩 EditMemoModal (수정 모달)
+    // ========================================
+    function EditMemoModal({ memo, isOpen, onClose, onSave, saving }) {
+      const [title, setTitle] = useState('');
+      const [content, setContent] = useState('');
+
+      useEffect(() => {
+        if (memo) {
+          setTitle(memo.title);
+          setContent(memo.content || '');
+        }
+      }, [memo]);
+
+      const handleSubmit = async (e) => {
+        e.preventDefault();
+        if (!title.trim() || saving) return;
+        await onSave(memo.id, { title: title.trim(), content: content.trim() });
+      };
+
+      return (
+        <Modal isOpen={isOpen} onClose={onClose} title="메모 수정">
+          <form onSubmit={handleSubmit} className="space-y-3">
+            <Input
+              value={title}
+              onChange={(e) => setTitle(e.target.value)}
+              placeholder="제목을 입력하세요"
+              disabled={saving}
+            />
+            <Textarea
+              value={content}
+              onChange={(e) => setContent(e.target.value)}
+              placeholder="내용을 입력하세요 (선택)"
+              rows={5}
+              disabled={saving}
+            />
+            <div className="flex justify-end gap-2">
+              <Button variant="ghost" onClick={onClose} disabled={saving}>
+                취소
+              </Button>
+              <Button type="submit" disabled={saving || !title.trim()}>
+                저장
+              </Button>
+            </div>
+          </form>
+        </Modal>
+      );
+    }
+
+    // ========================================
+    // 🧩 MemoItem
+    // ========================================
+    function MemoItem({ memo, onEdit, onDelete }) {
+      return (
+        <li className="px-4 py-4 border-b border-slate-100 last:border-b-0 group">
+          <div className="flex items-start justify-between gap-3">
+            <div className="min-w-0 flex-1">
+              <h3 className="text-sm font-semibold text-slate-800 truncate">{memo.title}</h3>
+              {memo.content && (
+                <p className="text-sm text-slate-500 mt-1 line-clamp-2 whitespace-pre-wrap break-words">
+                  {memo.content}
+                </p>
+              )}
+              <p className="text-xs text-slate-400 mt-2">{formatDate(memo.created_at)}</p>
+            </div>
+            <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity shrink-0">
+              <Button variant="ghost" size="sm" onClick={() => onEdit(memo)}>
+                수정
+              </Button>
+              <Button variant="danger" size="sm" onClick={() => onDelete(memo.id)}>
+                삭제
+              </Button>
+            </div>
+          </div>
+        </li>
+      );
+    }
+
+    // ========================================
+    // 📄 App
+    // ========================================
+    function App() {
+      const [memos, setMemos] = useState([]);
+      const [loading, setLoading] = useState(true);
+      const [error, setError] = useState(null);
+      const [submitting, setSubmitting] = useState(false);
+      const [editingMemo, setEditingMemo] = useState(null);
+      const [saving, setSaving] = useState(false);
+      const [search, setSearch] = useState('');
+      const debounceRef = useRef(null);
+      const isFirstRun = useRef(true);
+
+      const loadMemos = useCallback(async (query) => {
+        setLoading(true);
+        setError(null);
+        try {
+          const suffix = query ? `?q=${encodeURIComponent(query)}` : '';
+          const data = await apiRequest(`/memos${suffix}`);
+          setMemos(data);
+        } catch (err) {
+          setError(err.message);
+        } finally {
+          setLoading(false);
+        }
+      }, []);
+
+      useEffect(() => {
+        if (isFirstRun.current) {
+          isFirstRun.current = false;
+          loadMemos(search.trim());
+          return;
+        }
+        if (debounceRef.current) clearTimeout(debounceRef.current);
+        debounceRef.current = setTimeout(() => {
+          loadMemos(search.trim());
+        }, 300);
+        return () => clearTimeout(debounceRef.current);
+      }, [search, loadMemos]);
+
+      const handleCreate = async ({ title, content }) => {
+        setSubmitting(true);
+        setError(null);
+        try {
+          await apiRequest('/memos', {
+            method: 'POST',
+            body: JSON.stringify({ title, content }),
+          });
+          await loadMemos(search.trim());
+        } catch (err) {
+          setError(err.message);
+        } finally {
+          setSubmitting(false);
+        }
+      };
+
+      const handleSave = async (id, { title, content }) => {
+        setSaving(true);
+        setError(null);
+        try {
+          await apiRequest(`/memos/${id}`, {
+            method: 'PATCH',
+            body: JSON.stringify({ title, content }),
+          });
+          setEditingMemo(null);
+          await loadMemos(search.trim());
+        } catch (err) {
+          setError(err.message);
+        } finally {
+          setSaving(false);
+        }
+      };
+
+      const handleDelete = async (id) => {
+        if (!window.confirm('이 메모를 삭제할까요?')) return;
+        const prevMemos = memos;
+        setMemos((prev) => prev.filter((m) => m.id !== id));
+        try {
+          await apiRequest(`/memos/${id}`, { method: 'DELETE' });
+        } catch (err) {
+          setError(err.message);
+          setMemos(prevMemos);
+        }
+      };
+
+      return (
+        <div className="max-w-md mx-auto py-12 px-4">
+          <h1 className="text-2xl font-bold text-slate-800 mb-6 text-center">📝 메모장</h1>
+
+          <MemoForm onCreate={handleCreate} submitting={submitting} />
+
+          {error && (
+            <div className="mb-4 text-sm text-red-500 bg-red-50 border border-red-100 rounded-lg px-4 py-2">
+              {error}
+            </div>
+          )}
+
+          <SearchBar value={search} onChange={setSearch} />
+
+          <Card>
+            {loading ? (
+              <div className="py-10 text-center text-sm text-slate-400">불러오는 중...</div>
+            ) : memos.length === 0 ? (
+              <div className="py-10 text-center text-sm text-slate-400">
+                {search.trim() ? '검색 결과가 없습니다.' : '메모가 없습니다. 새로 작성해보세요!'}
+              </div>
+            ) : (
+              <ul>
+                {memos.map((memo) => (
+                  <MemoItem
+                    key={memo.id}
+                    memo={memo}
+                    onEdit={setEditingMemo}
+                    onDelete={handleDelete}
+                  />
+                ))}
+              </ul>
+            )}
+          </Card>
+
+          {!loading && memos.length > 0 && (
+            <p className="mt-3 text-center text-xs text-slate-400">
+              {search.trim() ? `검색 결과 ${memos.length}개` : `전체 메모 ${memos.length}개`}
+            </p>
+          )}
+
+          <EditMemoModal
+            memo={editingMemo}
+            isOpen={!!editingMemo}
+            onClose={() => setEditingMemo(null)}
+            onSave={handleSave}
+            saving={saving}
+          />
+        </div>
+      );
+    }
+
+    // ========================================
+    // Rendering
+    // ========================================
+    ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+  </script>
+</body>
+</html>
